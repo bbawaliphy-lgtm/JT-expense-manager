@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juice Therapy - Stock Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b35, #ff8e35);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #dee2e6;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #ff6b35;
+            border-bottom-color: #ff6b35;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .order-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .order-header-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .items-section {
+            margin-bottom: 30px;
+        }
+
+        .items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .item-row {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ff6b35;
+        }
+
+        .item-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .item-number {
+            background: #ff6b35;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .item-total {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b35, #ff8e35);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .remove-item-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .remove-item-btn:hover {
+            background: #c82333;
+        }
+
+        .add-item-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .add-item-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .order-summary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .order-summary h3 {
+            margin-bottom: 15px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .summary-card h3 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .summary-card p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .filters {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .export-import {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .order-header-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .item-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .export-import {
+                flex-direction: column;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .close:hover {
+            color: #dc3545;
+        }
+
+        .cloud-backup {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+.backup-history {
+    margin-top: 20px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+}
+.backup-history table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.backup-history th, .backup-history td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+.backup-history th {
+    background: #667eea;
+    color: white;
+}
+
+
+        .backup-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+.latest-backup {
+    background-color: #d4edda !important;
+    font-weight: bold;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🥤 Juice Therapy</h1>
+            <p>Stock Purchase Management System By Biplab Bawali</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('add')">Add Purchase Order</button>
+            <button class="nav-tab" onclick="showTab('view')">View Records</button>
+            <button class="nav-tab" onclick="showTab('summary')">Summary</button>
+        </div>
+
+        <!-- Add Purchase Tab -->
+        <div id="add-tab" class="tab-content active">
+            <h2>Add New Purchase Order</h2>
+            
+            <!-- Order Header Information -->
+            <div class="order-header">
+                <h3>Order Information</h3>
+                <div class="order-header-grid">
+                    <div class="form-group">
+                        <label for="order-date">Date *</label>
+                        <input type="date" id="order-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-invoice">Invoice Number *</label>
+                        <input type="text" id="order-invoice" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-supplier">Supplier Name *</label>
+                        <input type="text" id="order-supplier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="order-payment">Payment Mode *</label>
+                        <select id="order-payment" required>
+                            <option value="">Select Payment Mode</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Card">Card</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Credit">Credit</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="order-remarks">Order Remarks</label>
+                        <textarea id="order-remarks" rows="3" placeholder="Any additional notes for this order..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Section -->
+            <div class="items-section">
+                <div class="items-header">
+                    <h3>Order Items</h3>
+                    <button type="button" class="add-item-btn" onclick="addItemRow()">+ Add Item</button>
+                </div>
+                
+                <div id="items-container">
+                    <!-- Items will be added dynamically -->
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <h3>Order Summary</h3>
+                <div class="summary-row">
+                    <span>Total Items:</span>
+                    <span id="total-items">0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Total Amount:</span>
+                    <span id="total-amount">₹0.00</span>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="btn btn-primary" onclick="saveOrder()">Save Complete Order</button>
+                <button type="button" class="btn btn-secondary" onclick="resetOrderForm()">Reset Form</button>
+            </div>
+        </div>
+
+        <!-- View Records Tab -->
+        <div id="view-tab" class="tab-content">
+            <h2>Purchase Records</h2>
+            
+            <div class="export-import">
+                <button class="btn btn-success" onclick="exportToCSV()">Export to CSV</button>
+                <button class="btn btn-success" onclick="exportToJSON()">Export to JSON</button>
+                <label for="import-csv" class="btn btn-secondary">Import CSV</label>
+                <input type="file" id="import-csv" class="file-input" accept=".csv" onchange="importFromCSV(event)">
+                <button class="btn btn-primary" onclick="showCloudBackup()">Cloud Backup</button>
+            </div>
+
+            <div class="filters">
+                <h3>Filters</h3>
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label for="filter-date-from">Date From</label>
+                        <input type="date" id="filter-date-from" onchange="applyFilters()">
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-date-to">Date To</label>
+                        <input type="date" id="filter-date-to" onchange="applyFilters()">
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-invoice">Invoice Number</label>
+                        <input type="text" id="filter-invoice" placeholder="Search invoice..." oninput="applyFilters()">
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-item">Item Name</label>
+                        <input type="text" id="filter-item" placeholder="Search item..." oninput="applyFilters()">
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-category">Category</label>
+                        <select id="filter-category" onchange="applyFilters()">
+                            <option value="">All Categories</option>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Packaging">Packaging</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="records-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Invoice</th>
+                            <th>Supplier</th>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Unit Price</th>
+                            <th>Total Cost</th>
+                            <th>Payment</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-tbody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cloud Backup Section -->
+            <div id="cloud-backup" class="cloud-backup" style="display: none;">
+                <h3>Cloud Backup & Restore</h3>
+                <p>Backup your data to the cloud to prevent data loss and access from anywhere.</p>
+                
+                <div class="backup-controls">
+                    <button class="btn btn-success" onclick="backupToCloud()">Backup to Cloud</button>
+                    <button class="btn btn-primary" onclick="restoreFromCloud()">Restore from Cloud</button>
+                    <button class="btn btn-secondary" onclick="hideCloudBackup()">Hide</button>
+<button class="btn btn-warning" onclick="downloadTodayBackup()">Download Today's Backup</button>
+<label for="import-json-backup" class="btn btn-primary">Restore from JSON File</label>
+<input type="file" id="import-json-backup" class="file-input" accept=".json" onchange="restoreFromJSONFile(event)">
+
+                </div>
+                <div class="backup-history">
+    <h3>Backup History</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="backup-history-body">
+            <tr><td colspan="3">No backups yet</td></tr>
+        </tbody>
+    </table>
+</div>
+
+                <div id="backup-status" style="margin-top: 15px; padding: 10px; border-radius: 5px;"></div>
+            </div>
+        </div>
+
+        <!-- Summary Tab -->
+        <div id="summary-tab" class="tab-content">
+            <h2>Expense Summary</h2>
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3 id="today-total">₹0</h3>
+                    <p>Today's Expenses</p>
+                </div>
+                <div class="summary-card">
+                    <h3 id="month-total">₹0</h3>
+                    <p>This Month</p>
+                </div>
+                <div class="summary-card">
+                    <h3 id="overall-total">₹0</h3>
+                    <p>Total Expenses</p>
+                </div>
+                <div class="summary-card">
+                    <h3 id="record-count">0</h3>
+                    <p>Total Records</p>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h3 style="margin-bottom: 15px;">Category-wise Summary</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Total Amount</th>
+                            <th>Records Count</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="category-summary">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Purchase Record</h2>
+                <button class="close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="edit-form">
+                <div class="order-header-grid">
+                    <div class="form-group">
+                        <label for="edit-date">Date *</label>
+                        <input type="date" id="edit-date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-invoice">Invoice Number *</label>
+                        <input type="text" id="edit-invoice" name="invoice" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-supplier">Supplier Name *</label>
+                        <input type="text" id="edit-supplier" name="supplier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-item">Item Name *</label>
+                        <input type="text" id="edit-item" name="item" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-category">Category *</label>
+                        <select id="edit-category" name="category" required>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Packaging">Packaging</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-quantity">Quantity *</label>
+                        <input type="number" id="edit-quantity" name="quantity" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-unit">Unit *</label>
+                        <select id="edit-unit" name="unit" required>
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="g">Gram (g)</option>
+                            <option value="L">Liter (L)</option>
+                            <option value="mL">Milliliter (mL)</option>
+                            <option value="pieces">Pieces</option>
+                            <option value="boxes">Boxes</option>
+                            <option value="packets">Packets</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-unit-price">Unit Price (₹) *</label>
+                        <input type="number" id="edit-unit-price" name="unitPrice" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-total-cost">Total Cost (₹)</label>
+                        <input type="number" id="edit-total-cost" name="totalCost" step="0.01" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-payment-mode">Payment Mode *</label>
+                        <select id="edit-payment-mode" name="paymentMode" required>
+                            <option value="Cash">Cash</option>
+                            <option value="Card">Card</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Credit">Credit</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="edit-remarks">Remarks</label>
+                        <textarea id="edit-remarks" name="remarks" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Update Record</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let purchases = [];
+        let editingIndex = -1;
+        let itemCounter = 0;
+let lastBackupTimestamp = null;
+let lastSaveTimestamp = null;
+
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            setTodayDate();
+            displayRecords();
+            updateSummary();
+checkDailyBackup();
+            addItemRow(); // Add first item row
+            
+            // Add sample data if no data exists
+            if (purchases.length === 0) {
+                addSampleData();
+            }
+        });
+
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('order-date').value = today;
+        }
+
+        function addSampleData() {
+            const sampleData = [
+                {
+                    date: '2025-09-14',
+                    invoice: 'INV001',
+                    supplier: 'Fresh Fruits Ltd',
+                    item: 'Orange',
+                    category: 'Fruits',
+                    quantity: 50,
+                    unit: 'kg',
+                    unitPrice: 60,
+                    totalCost: 3000,
+                    paymentMode: 'UPI',
+                    remarks: 'Fresh oranges for juice'
+                },
+                {
+                    date: '2025-09-14',
+                    invoice: 'INV001',
+                    supplier: 'Fresh Fruits Ltd',
+                    item: 'Apple',
+                    category: 'Fruits',
+                    quantity: 30,
+                    unit: 'kg',
+                    unitPrice: 80,
+                    totalCost: 2400,
+                    paymentMode: 'UPI',
+                    remarks: 'Red apples for juice'
+                },
+                {
+                    date: '2025-09-14',
+                    invoice: 'INV002',
+                    supplier: 'Green Veggie Co',
+                    item: 'Carrot',
+                    category: 'Vegetables',
+                    quantity: 25,
+                    unit: 'kg',
+                    unitPrice: 40,
+                    totalCost: 1000,
+                    paymentMode: 'Cash',
+                    remarks: 'Organic carrots'
+                },
+                {
+                    date: '2025-09-13',
+                    invoice: 'INV003',
+                    supplier: 'Dairy Fresh',
+                    item: 'Milk',
+                    category: 'Dairy',
+                    quantity: 20,
+                    unit: 'L',
+                    unitPrice: 50,
+                    totalCost: 1000,
+                    paymentMode: 'Card',
+                    remarks: 'Full cream milk'
+                }
+            ];
+            
+            purchases = sampleData;
+            saveData();
+            displayRecords();
+            updateSummary();
+        }
+
+        function addItemRow() {
+            itemCounter++;
+            const container = document.getElementById('items-container');
+            
+            const itemRow = document.createElement('div');
+            itemRow.className = 'item-row';
+            itemRow.id = `item-row-${itemCounter}`;
+            
+            itemRow.innerHTML = `
+                <div class="item-row-header">
+                    <span class="item-number">Item #${itemCounter}</span>
+                    <button type="button" class="remove-item-btn" onclick="removeItemRow(${itemCounter})" ${itemCounter === 1 ? 'style="display:none"' : ''}>Remove Item</button>
+                </div>
+                <div class="item-grid">
+                    <div class="form-group">
+                        <label>Item Name *</label>
+                        <input type="text" id="item-name-${itemCounter}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="item-category-${itemCounter}" required>
+                            <option value="">Select Category</option>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Packaging">Packaging</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity *</label>
+                        <input type="number" id="item-quantity-${itemCounter}" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit *</label>
+                        <select id="item-unit-${itemCounter}" required>
+                            <option value="">Select Unit</option>
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="g">Gram (g)</option>
+                            <option value="L">Liter (L)</option>
+                            <option value="mL">Milliliter (mL)</option>
+                            <option value="pieces">Pieces</option>
+                            <option value="boxes">Boxes</option>
+                            <option value="packets">Packets</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Price (₹) *</label>
+                        <input type="number" id="item-price-${itemCounter}" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Item Remarks</label>
+                        <textarea id="item-remarks-${itemCounter}" rows="2" placeholder="Notes for this item..."></textarea>
+                    </div>
+                </div>
+                <div class="item-total" id="item-total-${itemCounter}">
+                    Total: ₹0.00
+                </div>
+            `;
+            
+            container.appendChild(itemRow);
+            
+            // Add event listeners for calculation
+            document.getElementById(`item-quantity-${itemCounter}`).addEventListener('input', function() {
+                calculateItemTotal(itemCounter);
+            });
+            document.getElementById(`item-price-${itemCounter}`).addEventListener('input', function() {
+                calculateItemTotal(itemCounter);
+            });
+            
+            updateOrderSummary();
+        }
+
+        function removeItemRow(itemId) {
+            const itemRow = document.getElementById(`item-row-${itemId}`);
+            if (itemRow) {
+                itemRow.remove();
+                updateOrderSummary();
+            }
+            
+            // Show remove button for remaining items if more than 1
+            const remainingItems = document.querySelectorAll('.item-row').length;
+            if (remainingItems === 1) {
+                const removeBtn = document.querySelector('.remove-item-btn');
+                if (removeBtn) removeBtn.style.display = 'none';
+            } else if (remainingItems > 1) {
+                document.querySelectorAll('.remove-item-btn').forEach(btn => {
+                    btn.style.display = 'inline-block';
+                });
+            }
+        }
+
+        function calculateItemTotal(itemId) {
+            const quantityEl = document.getElementById(`item-quantity-${itemId}`);
+            const priceEl = document.getElementById(`item-price-${itemId}`);
+            const totalEl = document.getElementById(`item-total-${itemId}`);
+            
+            if (quantityEl && priceEl && totalEl) {
+                const quantity = parseFloat(quantityEl.value) || 0;
+                const price = parseFloat(priceEl.value) || 0;
+                const total = quantity * price;
+                
+                totalEl.textContent = `Total: ₹${total.toFixed(2)}`;
+            }
+            updateOrderSummary();
+        }
+
+        function updateOrderSummary() {
+            const itemRows = document.querySelectorAll('.item-row');
+            let totalItems = itemRows.length;
+            let totalAmount = 0;
+            
+            itemRows.forEach((row) => {
+                const itemId = row.id.split('-')[2];
+                const quantityEl = document.getElementById(`item-quantity-${itemId}`);
+                const priceEl = document.getElementById(`item-price-${itemId}`);
+                
+                if (quantityEl && priceEl) {
+                    const quantity = parseFloat(quantityEl.value) || 0;
+                    const price = parseFloat(priceEl.value) || 0;
+                    totalAmount += quantity * price;
+                }
+            });
+            
+            document.getElementById('total-items').textContent = totalItems;
+            document.getElementById('total-amount').textContent = `₹${totalAmount.toFixed(2)}`;
+        }
+
+        function saveOrder() {
+            // Validate order header
+            const orderDate = document.getElementById('order-date').value;
+            const orderInvoice = document.getElementById('order-invoice').value;
+            const orderSupplier = document.getElementById('order-supplier').value;
+            const orderPayment = document.getElementById('order-payment').value;
+            const orderRemarks = document.getElementById('order-remarks').value;
+            
+            if (!orderDate || !orderInvoice || !orderSupplier || !orderPayment) {
+                alert('Please fill in all required order information fields.');
+                return;
+            }
+            
+            // Validate and collect items
+            const itemRows = document.querySelectorAll('.item-row');
+            const orderItems = [];
+            let isValid = true;
+            
+            itemRows.forEach((row) => {
+                const itemId = row.id.split('-')[2];
+                const itemName = document.getElementById(`item-name-${itemId}`)?.value;
+                const itemCategory = document.getElementById(`item-category-${itemId}`)?.value;
+                const itemQuantity = parseFloat(document.getElementById(`item-quantity-${itemId}`)?.value);
+                const itemUnit = document.getElementById(`item-unit-${itemId}`)?.value;
+                const itemPrice = parseFloat(document.getElementById(`item-price-${itemId}`)?.value);
+                const itemRemarks = document.getElementById(`item-remarks-${itemId}`)?.value;
+                
+                if (!itemName || !itemCategory || !itemQuantity || !itemUnit || !itemPrice) {
+                    isValid = false;
+                    return;
+                }
+                
+                orderItems.push({
+                    date: orderDate,
+                    invoice: orderInvoice,
+                    supplier: orderSupplier,
+                    item: itemName,
+                    category: itemCategory,
+                    quantity: itemQuantity,
+                    unit: itemUnit,
+                    unitPrice: itemPrice,
+                    totalCost: itemQuantity * itemPrice,
+                    paymentMode: orderPayment,
+                    remarks: itemRemarks || orderRemarks
+                });
+            });
+            
+            if (!isValid) {
+                alert('Please fill in all required item fields.');
+                return;
+            }
+            
+            if (orderItems.length === 0) {
+                alert('Please add at least one item to the order.');
+                return;
+            }
+            
+            // Add all items to purchases
+            purchases = [...purchases, ...orderItems];
+            saveData();
+            displayRecords();
+            updateSummary();
+            resetOrderForm();
+            
+            alert(`Order saved successfully! Added ${orderItems.length} items to inventory.`);
+        }
+
+        function resetOrderForm() {
+            document.getElementById('order-date').value = '';
+            document.getElementById('order-invoice').value = '';
+            document.getElementById('order-supplier').value = '';
+            document.getElementById('order-payment').value = '';
+            document.getElementById('order-remarks').value = '';
+            
+            // Clear all item rows and add one fresh row
+            document.getElementById('items-container').innerHTML = '';
+            itemCounter = 0;
+            addItemRow();
+            setTodayDate();
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'summary') {
+                updateSummary();
+            }
+        }
+
+        function displayRecords() {
+            const tbody = document.getElementById('records-tbody');
+            const filteredRecords = getFilteredRecords();
+            
+            if (filteredRecords.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="11" class="empty-state">
+                            <span class="icon">📋</span>
+                            <h3>No records found</h3>
+                            <p>Add some purchase records or adjust your filters</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = filteredRecords.map((purchase) => `
+                <tr>
+                    <td>${formatDate(purchase.date)}</td>
+                    <td>${purchase.invoice}</td>
+                    <td>${purchase.supplier}</td>
+                    <td>${purchase.item}</td>
+                    <td>${purchase.category}</td>
+                    <td>${purchase.quantity}</td>
+                    <td>${purchase.unit}</td>
+                    <td>₹${purchase.unitPrice.toFixed(2)}</td>
+                    <td>₹${purchase.totalCost.toFixed(2)}</td>
+                    <td>${purchase.paymentMode}</td>
+                    <td class="actions">
+                        <button class="btn btn-sm btn-primary" onclick="editRecord(${purchases.indexOf(purchase)})">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteRecord(${purchases.indexOf(purchase)})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getFilteredRecords() {
+            let filtered = [...purchases];
+            
+            const dateFrom = document.getElementById('filter-date-from').value;
+            const dateTo = document.getElementById('filter-date-to').value;
+            const invoice = document.getElementById('filter-invoice').value.toLowerCase();
+            const item = document.getElementById('filter-item').value.toLowerCase();
+            const category = document.getElementById('filter-category').value;
+            
+            if (dateFrom) {
+                filtered = filtered.filter(p => p.date >= dateFrom);
+            }
+            if (dateTo) {
+                filtered = filtered.filter(p => p.date <= dateTo);
+            }
+            if (invoice) {
+                filtered = filtered.filter(p => p.invoice.toLowerCase().includes(invoice));
+            }
+            if (item) {
+                filtered = filtered.filter(p => p.item.toLowerCase().includes(item));
+            }
+            if (category) {
+                filtered = filtered.filter(p => p.category === category);
+            }
+            
+            return filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        function applyFilters() {
+            displayRecords();
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-date-from').value = '';
+            document.getElementById('filter-date-to').value = '';
+            document.getElementById('filter-invoice').value = '';
+            document.getElementById('filter-item').value = '';
+            document.getElementById('filter-category').value = '';
+            displayRecords();
+        }
+
+        function editRecord(index) {
+            editingIndex = index;
+            const purchase = purchases[index];
+            
+            document.getElementById('edit-date').value = purchase.date;
+            document.getElementById('edit-invoice').value = purchase.invoice;
+            document.getElementById('edit-supplier').value = purchase.supplier;
+            document.getElementById('edit-item').value = purchase.item;
+            document.getElementById('edit-category').value = purchase.category;
+            document.getElementById('edit-quantity').value = purchase.quantity;
+            document.getElementById('edit-unit').value = purchase.unit;
+            document.getElementById('edit-unit-price').value = purchase.unitPrice;
+            document.getElementById('edit-total-cost').value = purchase.totalCost;
+            document.getElementById('edit-payment-mode').value = purchase.paymentMode;
+            document.getElementById('edit-remarks').value = purchase.remarks;
+            
+            // Add event listeners for edit form calculation
+            document.getElementById('edit-quantity').addEventListener('input', calculateEditTotal);
+            document.getElementById('edit-unit-price').addEventListener('input', calculateEditTotal);
+            
+            document.getElementById('edit-modal').style.display = 'block';
+        }
+
+        function calculateEditTotal() {
+            const quantity = parseFloat(document.getElementById('edit-quantity').value) || 0;
+            const unitPrice = parseFloat(document.getElementById('edit-unit-price').value) || 0;
+            document.getElementById('edit-total-cost').value = (quantity * unitPrice).toFixed(2);
+        }
+
+        // Edit form submission
+        document.getElementById('edit-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const purchase = {
+                date: formData.get('date'),
+                invoice: formData.get('invoice'),
+                supplier: formData.get('supplier'),
+                item: formData.get('item'),
+                category: formData.get('category'),
+                quantity: parseFloat(formData.get('quantity')),
+                unit: formData.get('unit'),
+                unitPrice: parseFloat(formData.get('unitPrice')),
+                totalCost: parseFloat(formData.get('totalCost')),
+                paymentMode: formData.get('paymentMode'),
+                remarks: formData.get('remarks') || ''
+            };
+            
+            purchases[editingIndex] = purchase;
+            saveData();
+            displayRecords();
+            updateSummary();
+            closeEditModal();
+            
+            alert('Purchase record updated successfully!');
+        });
+
+        function deleteRecord(index) {
+            if (confirm('Are you sure you want to delete this record?')) {
+                purchases.splice(index, 1);
+                saveData();
+                displayRecords();
+                updateSummary();
+                alert('Record deleted successfully!');
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+            editingIndex = -1;
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('juiceTherapyPurchases', JSON.stringify(purchases));
+                localStorage.setItem('juiceTherapyLastBackup', new Date().toISOString());
+            } catch (e) {
+                console.log('Storage not available, using session data');
+            }
+        }
+
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('juiceTherapyPurchases');
+                if (saved) {
+                    purchases = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.log('Storage not available, using session data');
+                purchases = [];
+            }
+        }
+
+        function updateSummary() {
+            const today = new Date().toISOString().split('T')[0];
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            let todayTotal = 0;
+            let monthTotal = 0;
+            let overallTotal = 0;
+            const categoryTotals = {};
+            
+            purchases.forEach(purchase => {
+                const purchaseDate = new Date(purchase.date);
+                const amount = purchase.totalCost;
+                
+                overallTotal += amount;
+                
+                if (purchase.date === today) {
+                    todayTotal += amount;
+                }
+                
+                if (purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear) {
+                    monthTotal += amount;
+                }
+                
+                if (!categoryTotals[purchase.category]) {
+                    categoryTotals[purchase.category] = { amount: 0, count: 0 };
+                }
+                categoryTotals[purchase.category].amount += amount;
+                categoryTotals[purchase.category].count += 1;
+            });
+            
+            document.getElementById('today-total').textContent = `₹${todayTotal.toFixed(2)}`;
+            document.getElementById('month-total').textContent = `₹${monthTotal.toFixed(2)}`;
+            document.getElementById('overall-total').textContent = `₹${overallTotal.toFixed(2)}`;
+            document.getElementById('record-count').textContent = purchases.length;
+            
+            // Update category summary
+            const categorySummary = document.getElementById('category-summary');
+            const sortedCategories = Object.entries(categoryTotals)
+                .sort(([,a], [,b]) => b.amount - a.amount);
+            
+            if (sortedCategories.length === 0) {
+                categorySummary.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            <span class="icon">📊</span>
+                            <h3>No data available</h3>
+                            <p>Add some purchase records to see category summary</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            categorySummary.innerHTML = sortedCategories.map(([category, data]) => {
+                const percentage = overallTotal > 0 ? (data.amount / overallTotal * 100).toFixed(1) : 0;
+                return `
+                    <tr>
+                        <td>${category}</td>
+                        <td>₹${data.amount.toFixed(2)}</td>
+                        <td>${data.count}</td>
+                        <td>${percentage}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function exportToCSV() {
+            if (purchases.length === 0) {
+                alert('No data to export!');
+                return;
+            }
+            
+            const headers = ['Date', 'Invoice Number', 'Supplier Name', 'Item Name', 'Category', 'Quantity', 'Unit', 'Unit Price', 'Total Cost', 'Payment Mode', 'Remarks'];
+            const csvContent = [
+                headers.join(','),
+                ...purchases.map(p => [
+                    p.date,
+                    `"${p.invoice}"`,
+                    `"${p.supplier}"`,
+                    `"${p.item}"`,
+                    p.category,
+                    p.quantity,
+                    p.unit,
+                    p.unitPrice,
+                    p.totalCost,
+                    p.paymentMode,
+                    `"${(p.remarks || '').replace(/"/g, '""')}"`
+                ].join(','))
+            ].join('\n');
+            
+            downloadFile(csvContent, 'juice_therapy_purchases.csv', 'text/csv');
+        }
+
+        function exportToJSON() {
+            if (purchases.length === 0) {
+                alert('No data to export!');
+                return;
+            }
+            
+            const jsonContent = JSON.stringify(purchases, null, 2);
+            downloadFile(jsonContent, 'juice_therapy_purchases.json', 'application/json');
+        }
+
+        function downloadFile(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importFromCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    const lines = csv.split('\n').filter(line => line.trim());
+                    
+                    if (lines.length < 2) {
+                        alert('CSV file appears to be empty or invalid.');
+                        return;
+                    }
+                    
+                    const importedPurchases = [];
+                    
+                    for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (!line) continue;
+                        
+                        const values = parseCSVLine(line);
+                        if (values.length >= 10) {
+                            const purchase = {
+                                date: values[0],
+                                invoice: values[1].replace(/"/g, ''),
+                                supplier: values[2].replace(/"/g, ''),
+                                item: values[3].replace(/"/g, ''),
+                                category: values[4],
+                                quantity: parseFloat(values[5]) || 0,
+                                unit: values[6],
+                                unitPrice: parseFloat(values[7]) || 0,
+                                totalCost: parseFloat(values[8]) || 0,
+                                paymentMode: values[9],
+                                remarks: values[10] ? values[10].replace(/"/g, '') : ''
+                            };
+                            
+                            if (purchase.date && purchase.invoice && purchase.supplier && 
+                                purchase.item && purchase.category && purchase.unit && 
+                                purchase.paymentMode) {
+                                importedPurchases.push(purchase);
+                            }
+                        }
+                    }
+                    
+                    if (importedPurchases.length > 0) {
+                        purchases = [...purchases, ...importedPurchases];
+                        saveData();
+                        displayRecords();
+                        updateSummary();
+                        alert(`Successfully imported ${importedPurchases.length} records!`);
+                    } else {
+                        alert('No valid records found in the CSV file.');
+                    }
+                } catch (error) {
+                    alert('Error importing CSV file: ' + error.message);
+                }
+                
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSVLine(line) {
+            const values = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') {
+                        current += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    values.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            values.push(current.trim());
+            
+            return values;
+        }
+
+        // Cloud backup functions
+        function showCloudBackup() {
+            document.getElementById('cloud-backup').style.display = 'block';
+            updateBackupStatus();
+        }
+
+        function hideCloudBackup() {
+            document.getElementById('cloud-backup').style.display = 'none';
+        }
+
+        function updateBackupStatus() {
+            const statusEl = document.getElementById('backup-status');
+            const lastBackup = localStorage.getItem('juiceTherapyLastBackup');
+            
+            if (lastBackup) {
+                const lastBackupDate = new Date(lastBackup);
+                statusEl.innerHTML = `<p style="color: green;">Last backup: ${lastBackupDate.toLocaleString()}</p>`;
+            } else {
+                statusEl.innerHTML = '<p style="color: orange;">No backup found. Please backup your data to the cloud.</p>';
+            }
+        }
+
+        function backupToCloud() {
+            // In a real implementation, this would connect to a cloud service
+            // For demonstration, we'll simulate this with localStorage
+            try {
+                // Simulate API call delay
+                document.getElementById('backup-status').innerHTML = '<p style="color: blue;">Backing up data to cloud...</p>';
+                
+                setTimeout(() => {
+                    // Store backup timestamp
+                    localStorage.setItem('juiceTherapyCloudBackup', JSON.stringify(purchases));
+                    localStorage.setItem('juiceTherapyLastBackup', new Date().toISOString());
+                    
+                    document.getElementById('backup-status').innerHTML = '<p style="color: green;">Backup successful! Your data is now stored in the cloud.</p>';
+                }, 1500);
+            } catch (error) {
+                document.getElementById('backup-status').innerHTML = `<p style="color: red;">Backup failed: ${error.message}</p>`;
+            }
+        }
+
+        function restoreFromCloud() {
+            // In a real implementation, this would retrieve data from a cloud service
+            // For demonstration, we'll simulate this with localStorage
+            try {
+                document.getElementById('backup-status').innerHTML = '<p style="color: blue;">Restoring data from cloud...</p>';
+                
+                setTimeout(() => {
+                    const cloudData = localStorage.getItem('juiceTherapyCloudBackup');
+                    
+                    if (cloudData) {
+                        if (confirm('This will replace your current data with the cloud backup. Continue?')) {
+                            purchases = JSON.parse(cloudData);
+                            saveData();
+                            displayRecords();
+                            updateSummary();
+                            document.getElementById('backup-status').innerHTML = '<p style="color: green;">Restore successful! Data loaded from cloud backup.</p>';
+                        }
+                    } else {
+                        document.getElementById('backup-status').innerHTML = '<p style="color: red;">No cloud backup found.</p>';
+                    }
+                }, 1500);
+            } catch (error) {
+                document.getElementById('backup-status').innerHTML = `<p style="color: red;">Restore failed: ${error.message}</p>`;
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('edit-modal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeEditModal();
+            }
+        });
+// ================== AUTO BACKUP TO JSON ==================
+function autoBackupJSON() {
+    if (purchases.length === 0) return;
+
+    const jsonContent = JSON.stringify(purchases, null, 2);
+
+    // One backup file per day
+    const today = new Date().toISOString().split('T')[0];
+    const filename = `juice_therapy_backup_${today}.json`;
+
+    // Check if today's backup link already exists
+    let existingLink = document.getElementById("daily-backup-link");
+
+    if (existingLink) {
+        // Update existing download link with new data
+        const blob = new Blob([jsonContent], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        existingLink.href = url;
+        existingLink.download = filename;
+        existingLink.dataset.blobUrl = url;
+
+        console.log("Daily backup updated:", filename);
+    } else {
+        // Create download link first time today
+        const blob = new Blob([jsonContent], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.id = "daily-backup-link";
+        a.href = url;
+        a.download = filename;
+        a.style.display = "none";
+        a.dataset.blobUrl = url;
+
+        document.body.appendChild(a);
+        a.click(); // Trigger first download
+        console.log("Daily backup created:", filename);
+    }
+
+    lastBackupTimestamp = Date.now();
+}
+
+let backupHistory = [];
+
+   function addBackupHistory() {
+    const now = new Date();
+    const date = now.toLocaleDateString('en-IN');
+    const time = now.toLocaleTimeString('en-IN');
+    const jsonContent = JSON.stringify(purchases, null, 2);
+
+backupHistory.unshift({ date, time, data: jsonContent }); // add at beginning
+
+    if (backupHistory.length > 20) backupHistory.shift(); // keep last 20
+
+    localStorage.setItem("juiceTherapyBackupHistory", JSON.stringify(backupHistory));
+    renderBackupHistory();
+}
+
+
+function renderBackupHistory() {
+    const tbody = document.getElementById("backup-history-body");
+    if (!tbody) return;
+
+    if (backupHistory.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3">No backups yet</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = backupHistory.map((entry, index) => {
+        const isLatest = index === 0 ? "latest-backup" : "";
+        return `
+            <tr class="${isLatest}">
+                <td>${entry.date}</td>
+                <td>${entry.time}</td>
+                <td><button class="btn btn-sm btn-warning" onclick="redownloadBackup(${index})">Redownload</button></td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function redownloadBackup(index) {
+    const entry = backupHistory[index];
+    if (!entry || !entry.data) {
+        alert("Backup data not available.");
+        return;
+    }
+
+    const filename = `juice_therapy_backup_${entry.date.replace(/\\//g, '-')}.json`;
+    const blob = new Blob([entry.data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+    alert(`Backup from ${entry.date} ${entry.time} redownloaded ✅`);
+}
+
+
+// Load backup history on startup
+document.addEventListener('DOMContentLoaded', function() {
+    const storedHistory = localStorage.getItem("juiceTherapyBackupHistory");
+    if (storedHistory) backupHistory = JSON.parse(storedHistory);
+    renderBackupHistory();
+});
+
+
+// Modify saveOrder to trigger backup after saving
+const originalSaveOrder = saveOrder;
+saveOrder = function() {
+    originalSaveOrder();   // call the existing saveOrder
+lastSaveTimestamp = Date.now();
+    autoBackupJSON();      // then trigger backup
+}
+function restoreFromJSONFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const restoredData = JSON.parse(e.target.result);
+
+            if (Array.isArray(restoredData) && restoredData.length > 0) {
+                if (confirm("Restoring will replace your current data. Continue?")) {
+                    purchases = restoredData;
+                    saveData();
+                    displayRecords();
+                    updateSummary();
+                    alert("Restore successful ✅");
+                }
+            } else {
+                alert("Invalid JSON backup file.");
+            }
+        } catch (err) {
+            alert("Error reading backup file: " + err.message);
+        }
+        event.target.value = ''; // reset input
+    };
+    reader.readAsText(file);
+}
+
+function downloadTodayBackup() {
+    if (purchases.length === 0) {
+        alert("No data available to backup.");
+        return;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const filename = `juice_therapy_backup_${today}.json`;
+    const jsonContent = JSON.stringify(purchases, null, 2);
+
+    const blob = new Blob([jsonContent], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+    lastBackupTimestamp = Date.now();
+    addBackupHistory();   // ✅ record it in history
+    alert("Today's backup downloaded ✅");
+}
+
+
+// ================== EXIT WARNING ==================
+window.addEventListener("beforeunload", function (e) {
+    // If a save was made but no backup after it
+    if (lastSaveTimestamp && (!lastBackupTimestamp || lastBackupTimestamp < lastSaveTimestamp)) {
+        const confirmationMessage = "⚠️ You have unsaved data that hasn't been backed up yet. Are you sure you want to leave?";
+        e.preventDefault();
+        e.returnValue = confirmationMessage; // For most browsers
+        return confirmationMessage;
+    }
+});
+
+function checkDailyBackup() {
+    const today = new Date().toISOString().split('T')[0];
+    const lastBackupDay = localStorage.getItem("juiceTherapyLastBackupDay");
+
+    if (lastBackupDay !== today) {
+        // Trigger a backup immediately
+        downloadTodayBackup();
+        localStorage.setItem("juiceTherapyLastBackupDay", today);
+        console.log("Daily auto-backup triggered for:", today);
+    } else {
+        console.log("Backup already created today:", today);
+    }
+}
+
+// Cleanup old backup blob URLs when page closes
+window.addEventListener("unload", function () {
+    const link = document.getElementById("daily-backup-link");
+    if (link && link.dataset.blobUrl) {
+        URL.revokeObjectURL(link.dataset.blobUrl);
+    }
+});
+    </script>
+
+
+</body>
+</html>
