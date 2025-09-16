@@ -1123,23 +1123,31 @@ checkDailyBackup();
             setTodayDate();
         }
 
-        function showTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected tab
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-            event.target.classList.add('active');
-            
-            if (tabName === 'summary') {
-                updateSummary();
-            }
-        }
+        function showTab(tabName, clickedEl) {
+  // hide all tabs & deactivate all nav buttons
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+  // show selected tab
+  const tab = document.getElementById(`${tabName}-tab`);
+  if (tab) tab.classList.add('active');
+
+  // mark the clicked nav button active if provided,
+  // otherwise try to find a matching nav button
+  if (clickedEl && clickedEl.classList) {
+    clickedEl.classList.add('active');
+  } else {
+    // attempt to find button with onclick that calls this tab
+    const selector = `.nav-tab[onclick*="showTab('${tabName}')"], .nav-tab[onclick*='showTab("${tabName}")']`;
+    const btn = document.querySelector(selector);
+    if (btn) btn.classList.add('active');
+  }
+
+  if (tabName === 'summary') {
+    updateSummary();
+  }
+}
+
 
         function displayRecords() {
             const tbody = document.getElementById('records-tbody');
@@ -1814,6 +1822,26 @@ window.addEventListener("unload", function () {
         URL.revokeObjectURL(link.dataset.blobUrl);
     }
 });
+// --- Expose functions to window so inline onclick="" calls work (module → global) ---
+window.showTab = showTab;
+window.addItemRow = addItemRow;
+window.removeItemRow = removeItemRow;
+window.saveOrder = saveOrder;
+window.resetOrderForm = resetOrderForm;
+window.exportToCSV = exportToCSV;
+window.exportToJSON = exportToJSON;
+window.importFromCSV = importFromCSV;
+window.showCloudBackup = showCloudBackup;
+window.hideCloudBackup = hideCloudBackup;
+window.backupToCloud = backupToCloud;
+window.restoreFromCloud = restoreFromCloud;
+window.downloadTodayBackup = downloadTodayBackup;
+window.restoreFromJSONFile = restoreFromJSONFile;
+window.editRecord = editRecord;
+window.deleteRecord = deleteRecord;
+window.closeEditModal = closeEditModal;
+window.redownloadBackup = redownloadBackup;
+
     </script>
 
 
