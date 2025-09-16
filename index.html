@@ -823,7 +823,27 @@
         </div>
     </div>
 
-    <script>
+        <script type="module">
+        // --- Firebase setup ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { getFirestore, collection, setDoc, getDocs, doc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyB_C__OZ6dWi1cZOBGOrJxNg_710lPwaxY",
+          authDomain: "jt-expense-manager.firebaseapp.com",
+          projectId: "jt-expense-manager",
+          storageBucket: "jt-expense-manager.firebasestorage.app",
+          messagingSenderId: "732957757227",
+          appId: "1:732957757227:web:c1c1e5758c7a16da473f6e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth();
+        signInAnonymously(auth);
+        const purchasesCollection = collection(db, "purchases");
+
         let purchases = [];
         let editingIndex = -1;
         let itemCounter = 0;
@@ -1549,50 +1569,53 @@ checkDailyBackup();
             }
         }
 
-        function backupToCloud() {
-            // In a real implementation, this would connect to a cloud service
-            // For demonstration, we'll simulate this with localStorage
-            try {
-                // Simulate API call delay
-                document.getElementById('backup-status').innerHTML = '<p style="color: blue;">Backing up data to cloud...</p>';
-                
-                setTimeout(() => {
-                    // Store backup timestamp
-                    localStorage.setItem('juiceTherapyCloudBackup', JSON.stringify(purchases));
-                    localStorage.setItem('juiceTherapyLastBackup', new Date().toISOString());
-                    
-                    document.getElementById('backup-status').innerHTML = '<p style="color: green;">Backup successful! Your data is now stored in the cloud.</p>';
-                }, 1500);
-            } catch (error) {
-                document.getElementById('backup-status').innerHTML = `<p style="color: red;">Backup failed: ${error.message}</p>`;
-            }
+        // ================== FIREBASE BACKUP FUNCTIONS ==================
+async function backupToCloud() {
+    try {
+        document.getElementById('backup-status').innerHTML =
+          '<p style="color: blue;">Backing up data to Firestore...</p>';
+
+        for (let p of purchases) {
+            const id = `${p.invoice}_${p.item}`.replace(/\s+/g, "_");
+            await setDoc(doc(purchasesCollection, id), p);
         }
 
-        function restoreFromCloud() {
-            // In a real implementation, this would retrieve data from a cloud service
-            // For demonstration, we'll simulate this with localStorage
-            try {
-                document.getElementById('backup-status').innerHTML = '<p style="color: blue;">Restoring data from cloud...</p>';
-                
-                setTimeout(() => {
-                    const cloudData = localStorage.getItem('juiceTherapyCloudBackup');
-                    
-                    if (cloudData) {
-                        if (confirm('This will replace your current data with the cloud backup. Continue?')) {
-                            purchases = JSON.parse(cloudData);
-                            saveData();
-                            displayRecords();
-                            updateSummary();
-                            document.getElementById('backup-status').innerHTML = '<p style="color: green;">Restore successful! Data loaded from cloud backup.</p>';
-                        }
-                    } else {
-                        document.getElementById('backup-status').innerHTML = '<p style="color: red;">No cloud backup found.</p>';
-                    }
-                }, 1500);
-            } catch (error) {
-                document.getElementById('backup-status').innerHTML = `<p style="color: red;">Restore failed: ${error.message}</p>`;
+        localStorage.setItem('juiceTherapyLastBackup', new Date().toISOString());
+        document.getElementById('backup-status').innerHTML =
+          '<p style="color: green;">✅ Backup successful — data saved in Firestore.</p>';
+    } catch (error) {
+        document.getElementById('backup-status').innerHTML =
+          `<p style="color: red;">❌ Backup failed: ${error.message}</p>`;
+    }
+}
+
+async function restoreFromCloud() {
+    try {
+        document.getElementById('backup-status').innerHTML =
+          '<p style="color: blue;">Restoring data from Firestore...</p>';
+
+        const snapshot = await getDocs(purchasesCollection);
+        const restored = [];
+        snapshot.forEach(docSnap => restored.push(docSnap.data()));
+
+        if (restored.length > 0) {
+            if (confirm('This will replace your current data with cloud data. Continue?')) {
+                purchases = restored;
+                saveData();
+                displayRecords();
+                updateSummary();
+                document.getElementById('backup-status').innerHTML =
+                  '<p style="color: green;">✅ Restore successful — data loaded from Firestore.</p>';
             }
+        } else {
+            document.getElementById('backup-status').innerHTML =
+              '<p style="color: red;">⚠️ No data found in Firestore.</p>';
         }
+    } catch (error) {
+        document.getElementById('backup-status').innerHTML =
+          `<p style="color: red;">❌ Restore failed: ${error.message}</p>`;
+    }
+}
 
         // Close modal when clicking outside
         window.onclick = function(event) {
