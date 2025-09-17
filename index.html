@@ -3,83 +3,101 @@
 <head>
 
     <style>
-  body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #6dd5fa, #2980b9);
+  /* Background */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #74ebd5, #9face6);
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
+/* Login screen container */
 #login-screen {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;   /* full height */
+  height: 100vh;
+  width: 100%;
 }
 
-#login-screen .card {
-  background: white;
-  padding: 30px 40px;
-  border-radius: 15px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+/* Login card */
+.login-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 40px 35px;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
   text-align: center;
-  width: 320px;
-  animation: fadeIn 0.8s ease-in-out;
+  width: 340px;
+  animation: fadeIn 0.9s ease-in-out;
+  color: #fff;
 }
 
-
-  #login-screen {
-    background: white;
-    padding: 30px 40px;
-    border-radius: 15px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-    text-align: center;
-    width: 320px;
-    animation: fadeIn 0.8s ease-in-out;
-  }
-
-  #login-screen h2 {
-    margin-bottom: 20px;
-    color: #2c3e50;
-  }
-
-  #login-screen input {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 14px;
-  }
-
-  #login-screen button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 15px;
-    background: #2980b9;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-
-  #login-screen button:hover {
-    background: #1f6391;
-  }
-
-  #login-error {
-    margin-top: 10px;
-    font-size: 13px;
-  }
-
-        .logout-container {
-  position: absolute;
-  top: 15px;
-  right: 20px;
+/* Title */
+.login-card h2 {
+  margin-bottom: 25px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
 }
+
+/* Inputs */
+.login-card input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* Button */
+.login-card button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background: #4e54c8;
+  background: linear-gradient(135deg, #4776e6, #8e54e9);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.login-card button:hover {
+  background: linear-gradient(135deg, #3650b3, #6f3ebd);
+}
+
+/* Error message */
+#login-error {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #ffdddd;
+}
+
+/* Developer credit */
+.developer-credit {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #eee;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 
 #logout-btn {
   padding: 8px 16px;
@@ -625,15 +643,16 @@
 <body>
   <!-- 🔐 LOGIN SCREEN (shown first) -->
 <div id="login-screen">
-  <div class="card">
-    <h2>🔐 JT Expense Manager</h2>
+  <div class="login-card">
+    <h2>🔐 Personal Expense Manager</h2>
     <input type="email" id="login-email" placeholder="Enter Email">
     <input type="password" id="login-password" placeholder="Enter Password">
     <button onclick="login()">Login</button>
-    <p id="login-error" style="color:red;"></p>
+    <p id="login-error"></p>
     <div class="developer-credit">Developed by <b>Biplab Bawali</b></div>
   </div>
 </div>
+
 
 
  <div id="app-screen" style="display:none;">
@@ -2169,7 +2188,6 @@ window.syncFromCloudOnLoad = syncFromCloudOnLoad;
 
     </script>
 
-<button onclick="logout()">Logout</button>
   </div>
 </body>
 </html>
