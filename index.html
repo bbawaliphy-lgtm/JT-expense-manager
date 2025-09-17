@@ -514,6 +514,15 @@
     </style>
 </head>
 <body>
+  <!-- 🔐 LOGIN SCREEN (shown first) -->
+  <div id="login-screen">
+    <h2>Login</h2>
+    <input type="email" id="login-email" placeholder="Email"><br><br>
+    <input type="password" id="login-password" placeholder="Password"><br><br>
+    <button onclick="login()">Login</button>
+    <p id="login-error" style="color:red;"></p>
+  </div>
+ <div id="app-screen" style="display:none;">
     <div class="container">
         <div class="header">
             <h1>🥤 Juice Therapy</h1>
@@ -836,7 +845,14 @@ import {
   enableIndexedDbPersistence,
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+           
 
 // Your Firebase config (you gave this earlier)
 const firebaseConfig = {
@@ -855,13 +871,12 @@ const db = getFirestore(app);
 // Try enabling offline persistence (optional, non-blocking)
 enableIndexedDbPersistence(db).catch(err => console.warn("IndexedDB persistence not enabled:", err && err.code));
 
-const auth = getAuth();
-// Sign in anonymously so Firestore security rules that require auth work
-signInAnonymously(auth).catch(e => console.warn("Anonymous sign-in failed:", e && e.message));
+const auth = getAuth(app);
 
-// Collection reference
+// Firestore collection reference
 const purchasesCollection = collection(db, "purchases");
-           // ===== REAL-TIME SYNC LISTENER =====
+
+// ===== REAL-TIME SYNC LISTENER =====
 onSnapshot(purchasesCollection, snapshot => {
     let cloudData = [];
     snapshot.forEach(docSnap => cloudData.push(docSnap.data()));
@@ -874,6 +889,41 @@ onSnapshot(purchasesCollection, snapshot => {
 
     console.log("🔄 Local data updated in real-time from Firestore.");
 });
+
+           // ===== AUTHENTICATION HANDLING =====
+
+// Login function
+async function login() {
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    document.getElementById("login-error").innerText = "";
+  } catch (e) {
+    document.getElementById("login-error").innerText = e.message;
+  }
+}
+
+// Logout function
+async function logout() {
+  await signOut(auth);
+}
+
+// Listen to login state changes
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app-screen").style.display = "block";
+  } else {
+    document.getElementById("login-screen").style.display = "block";
+    document.getElementById("app-screen").style.display = "none";
+  }
+});
+
+// Make login/logout available for onclick in HTML
+window.login = login;
+window.logout = logout;
+
 
 
            // Save or update a single record to Firestore (non-blocking)
@@ -2000,6 +2050,7 @@ window.syncFromCloudOnLoad = syncFromCloudOnLoad;
 
     </script>
 
-
+<button onclick="logout()">Logout</button>
+  </div>
 </body>
 </html>
