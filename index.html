@@ -833,7 +833,8 @@ import {
   getDocs,
   doc,
   deleteDoc,
-  enableIndexedDbPersistence
+  enableIndexedDbPersistence,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
@@ -860,6 +861,20 @@ signInAnonymously(auth).catch(e => console.warn("Anonymous sign-in failed:", e &
 
 // Collection reference
 const purchasesCollection = collection(db, "purchases");
+           // ===== REAL-TIME SYNC LISTENER =====
+onSnapshot(purchasesCollection, snapshot => {
+    let cloudData = [];
+    snapshot.forEach(docSnap => cloudData.push(docSnap.data()));
+
+    // Replace local data with cloud (to keep mirror)
+    purchases = cloudData;
+    saveData();
+    displayRecords();
+    updateSummary();
+
+    console.log("🔄 Local data updated in real-time from Firestore.");
+});
+
 
            // Save or update a single record to Firestore (non-blocking)
 async function backupSingleRecord(p) {
