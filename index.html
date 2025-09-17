@@ -4,15 +4,29 @@
 
     <style>
   body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #6dd5fa, #2980b9);
-    margin: 0;
-    padding: 0;
-    display: flex;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
-  }
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #6dd5fa, #2980b9);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+#login-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;   /* full height */
+}
+
+#login-screen .card {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 15px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  text-align: center;
+  width: 320px;
+  animation: fadeIn 0.8s ease-in-out;
+}
+
 
   #login-screen {
     background: white;
@@ -588,13 +602,16 @@
 <body>
   <!-- 🔐 LOGIN SCREEN (shown first) -->
 <div id="login-screen">
-  <h2>🔐 JT Expense Manager</h2>
-  <input type="email" id="login-email" placeholder="Enter Email">
-  <input type="password" id="login-password" placeholder="Enter Password">
-  <button onclick="login()">Login</button>
-  <p id="login-error" style="color:red;"></p>
-  <div class="developer-credit">Developed by <b>Biplab Bawali</b></div>
+  <div class="card">
+    <h2>🔐 JT Expense Manager</h2>
+    <input type="email" id="login-email" placeholder="Enter Email">
+    <input type="password" id="login-password" placeholder="Enter Password">
+    <button onclick="login()">Login</button>
+    <p id="login-error" style="color:red;"></p>
+    <div class="developer-credit">Developed by <b>Biplab Bawali</b></div>
+  </div>
 </div>
+
 
  <div id="app-screen" style="display:none;">
     <div class="container">
