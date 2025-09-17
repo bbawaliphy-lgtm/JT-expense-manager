@@ -75,6 +75,29 @@
     font-size: 13px;
   }
 
+        .logout-container {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+}
+
+#logout-btn {
+  padding: 8px 16px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#logout-btn:hover {
+  background: #c0392b;
+}
+
+
   .developer-credit {
     margin-top: 15px;
     font-size: 12px;
@@ -614,6 +637,11 @@
 
 
  <div id="app-screen" style="display:none;">
+
+     <div class="logout-container">
+    <button onclick="logout()" id="logout-btn">Logout</button>
+  </div>
+     
     <div class="container">
         <div class="header">
             <h1>🥤 Juice Therapy</h1>
