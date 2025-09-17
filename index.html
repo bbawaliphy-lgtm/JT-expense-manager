@@ -152,6 +152,9 @@ body {
 
 <!-- 🔥 Favicon (your logo as tab/app icon) -->
   <link rel="icon" type="image/png" href="logo.png">
+    <!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
     
     <style>
         * {
@@ -2239,7 +2242,14 @@ window.backupSingleRecord = backupSingleRecord;
 window.syncFromCloudOnLoad = syncFromCloudOnLoad;
 
 
-           
+    // PWA: Register service worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("service-worker.js")
+    .then(() => console.log("✅ Service Worker registered"))
+    .catch(err => console.error("❌ Service Worker failed:", err));
+}
+       
 
     </script>
 
