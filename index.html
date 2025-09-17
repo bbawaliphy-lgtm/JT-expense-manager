@@ -679,7 +679,8 @@ body {
 </head>
 <body>
   <!-- 🔐 LOGIN SCREEN (shown first) -->
-<div id="login-screen">
+<!-- Login screen should be visible first -->
+<div id="login-screen" style="display:block;">
   <div class="login-card">
     <h2>🔐 Stock Purchase Management</h2>
     <input type="email" id="login-email" placeholder="Enter Email">
@@ -689,6 +690,12 @@ body {
     <div class="developer-credit">Developed by <b>Biplab Bawali</b></div>
   </div>
 </div>
+
+<!-- App screen stays hidden until login -->
+<div id="app-screen" style="display:none;">
+  <!-- your full app code goes here -->
+</div>
+
 
 
 
@@ -1088,13 +1095,16 @@ async function logout() {
 // Listen to login state changes
 onAuthStateChanged(auth, (user) => {
   if (user) {
+    // ✅ Logged in: hide login, show app
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("app-screen").style.display = "block";
   } else {
-    document.getElementById("login-screen").style.display = "block";
+    // ❌ Not logged in: keep login screen centered
+    document.getElementById("login-screen").style.display = "flex"; 
     document.getElementById("app-screen").style.display = "none";
   }
 });
+
 
 // Make login/logout available for onclick in HTML
 window.login = login;
