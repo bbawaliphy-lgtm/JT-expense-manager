@@ -726,6 +726,7 @@ body {
             <button class="nav-tab active" onclick="showTab('add')">Add Purchase Order</button>
             <button class="nav-tab" onclick="showTab('view')">View Records</button>
             <button class="nav-tab" onclick="showTab('summary')">Summary</button>
+            <button class="nav-tab" onclick="showTab('payeeSummary')">Payee Summary</button>
         </div>
 
         <!-- Add Purchase Tab -->
@@ -746,7 +747,27 @@ body {
                     </div>
                     <div class="form-group">
                         <label for="order-supplier">Supplier Name *</label>
-                        <input type="text" id="order-supplier" required>
+                        <input type="text" id="order-supplier" list="supplier-suggestions" required>
+<!-- ========== PAYEE SECTION ========== -->
+<label for="order-payee">Payee:</label>
+<select id="order-payee" required>
+  <option value="">Select Payee</option>
+  <option value="Shop">Shop</option>
+  <option value="Dyutimala">Dyutimala</option>
+  <option value="Others">Others</option>
+</select>
+
+<div id="other-name-container" style="display:none; margin-top:4px;">
+  <label for="order-other-name">Other's Name:</label>
+  <input type="text" id="order-other-name" placeholder="Enter payee name">
+</div>
+
+<label for="order-payment-mode">Payment Mode:</label>
+<select id="order-payment-mode" required>
+  <option value="">Select Payment Mode</option>
+</select>
+
+
                     </div>
                     <div class="form-group">
                         <label for="order-payment">Payment Mode *</label>
@@ -759,6 +780,14 @@ body {
                             <option value="Credit">Credit</option>
                         </select>
                     </div>
+<div class="form-group">
+    <label for="order-discount">Discount (₹)</label>
+    <input type="number" id="order-discount" step="0.01" min="0" value="0" placeholder="0.00">
+</div>
+<div class="form-group">
+    <label for="order-other-charges">Other Charges (₹)</label>
+    <input type="number" id="order-other-charges" step="0.01" min="0" value="0" placeholder="0.00">
+</div>
                     <div class="form-group full-width">
                         <label for="order-remarks">Order Remarks</label>
                         <textarea id="order-remarks" rows="3" placeholder="Any additional notes for this order..."></textarea>
@@ -780,16 +809,28 @@ body {
 
             <!-- Order Summary -->
             <div class="order-summary">
-                <h3>Order Summary</h3>
-                <div class="summary-row">
-                    <span>Total Items:</span>
-                    <span id="total-items">0</span>
-                </div>
-                <div class="summary-row">
-                    <span>Total Amount:</span>
-                    <span id="total-amount">₹0.00</span>
-                </div>
-            </div>
+    <h3>Order Summary</h3>
+    <div class="summary-row">
+        <span>Total Items:</span>
+        <span id="total-items">0</span>
+    </div>
+    <div class="summary-row">
+        <span>Items Subtotal:</span>
+        <span id="items-subtotal">₹0.00</span>
+    </div>
+    <div class="summary-row">
+        <span>Discount (-):</span>
+        <span id="discount-amount">₹0.00</span>
+    </div>
+    <div class="summary-row">
+        <span>Other Charges (+):</span>
+        <span id="other-charges-amount">₹0.00</span>
+    </div>
+    <div class="summary-row" style="border-top: 2px solid #fff; margin-top: 10px; padding-top: 10px; font-size: 1.2em;">
+        <span><strong>Final Total:</strong></span>
+        <span id="total-amount"><strong>₹0.00</strong></span>
+    </div>
+</div>
 
             <div class="button-group">
                 <button type="button" class="btn btn-primary" onclick="saveOrder()">Save Complete Order</button>
@@ -859,6 +900,9 @@ body {
                             <th>Unit</th>
                             <th>Unit Price</th>
                             <th>Total Cost</th>
+<th>Discount</th>
+<th>Other Charges</th>
+<th>Final Total</th>
                             <th>Payment</th>
                             <th>Actions</th>
                         </tr>
@@ -941,6 +985,33 @@ body {
             </div>
         </div>
     </div>
+
+<!-- ================= PAYEE SUMMARY SECTION ================= -->
+<div id="payeeSummary" class="tab-content" style="display:none;">
+  <h2>Payee Summary</h2>
+
+  <div style="margin-bottom:10px;">
+    <label>From: <input type="date" id="payeeFrom"></label>
+    <label>To: <input type="date" id="payeeTo"></label>
+    <button class="action-btn" onclick="renderPayeeSummary()">Filter</button>
+<button class="action-btn" onclick="exportPayeeSummaryToExcel()">Export to Excel</button>
+
+  </div>
+
+  <table id="payeeSummaryTable" border="1" cellspacing="0" cellpadding="6" width="100%">
+    <thead style="background:#f0f0f0;">
+      <tr>
+        <th>Payee</th>
+        <th>Other Name</th>
+        <th>Payment Mode</th>
+        <th>Total Spent (₹)</th>
+        <th>Orders</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
 
     <!-- Edit Modal -->
     <div id="edit-modal" class="modal">
@@ -1068,6 +1139,10 @@ const auth = getAuth(app);
 
 // Firestore collection reference
 const purchasesCollection = collection(db, "purchases");
+const itemSuggestionsCollection = collection(db, "itemSuggestions");
+const supplierSuggestionsCollection = collection(db, "supplierSuggestions");
+
+
 
 // ===== REAL-TIME SYNC LISTENER =====
 onSnapshot(purchasesCollection, snapshot => {
@@ -1082,6 +1157,31 @@ onSnapshot(purchasesCollection, snapshot => {
 
     console.log("🔄 Local data updated in real-time from Firestore.");
 });
+
+// ===== REAL-TIME SYNC FOR ITEM SUGGESTIONS =====
+let itemSuggestions = [];
+
+onSnapshot(itemSuggestionsCollection, snapshot => {
+  itemSuggestions = [];
+  snapshot.forEach(docSnap => {
+    itemSuggestions.push(docSnap.id); // using document ID as item name
+  });
+  renderItemSuggestions(); // refresh datalist options
+  console.log("🔄 Item suggestions updated from Firestore:", itemSuggestions.length);
+});
+
+// ===== REAL-TIME SYNC FOR SUPPLIER SUGGESTIONS =====
+let supplierSuggestions = [];
+
+onSnapshot(supplierSuggestionsCollection, snapshot => {
+  supplierSuggestions = [];
+  snapshot.forEach(docSnap => {
+    supplierSuggestions.push(docSnap.id);
+  });
+  renderSupplierSuggestions();
+  console.log("🔄 Supplier suggestions updated from Firestore:", supplierSuggestions.length);
+});
+
 
            // ===== AUTHENTICATION HANDLING =====
 
@@ -1175,6 +1275,7 @@ async function syncFromCloudOnLoad() {
     await syncFromCloudOnLoad();
 
     setTodayDate();
+    await generateNextInvoiceNumber();
     displayRecords();
     updateSummary();
     checkDailyBackup();
@@ -1270,7 +1371,8 @@ async function syncFromCloudOnLoad() {
                 <div class="item-grid">
                     <div class="form-group">
                         <label>Item Name *</label>
-                        <input type="text" id="item-name-${itemCounter}" required>
+                        <input type="text" id="item-name-${itemCounter}" list="item-suggestions" required>
+
                     </div>
                     <div class="form-group">
                         <label>Category *</label>
@@ -1345,6 +1447,15 @@ async function syncFromCloudOnLoad() {
                     btn.style.display = 'inline-block';
                 });
             }
+// Add event listeners for discount and other charges (only add once)
+if (!document.getElementById('order-discount').hasAttribute('data-listener-added')) {
+    document.getElementById('order-discount').addEventListener('input', updateOrderSummary);
+    document.getElementById('order-discount').setAttribute('data-listener-added', 'true');
+}
+if (!document.getElementById('order-other-charges').hasAttribute('data-listener-added')) {
+    document.getElementById('order-other-charges').addEventListener('input', updateOrderSummary);
+    document.getElementById('order-other-charges').setAttribute('data-listener-added', 'true');
+}
         }
 
         function calculateItemTotal(itemId) {
@@ -1363,25 +1474,53 @@ async function syncFromCloudOnLoad() {
         }
 
         function updateOrderSummary() {
-            const itemRows = document.querySelectorAll('.item-row');
-            let totalItems = itemRows.length;
-            let totalAmount = 0;
-            
-            itemRows.forEach((row) => {
-                const itemId = row.id.split('-')[2];
-                const quantityEl = document.getElementById(`item-quantity-${itemId}`);
-                const priceEl = document.getElementById(`item-price-${itemId}`);
-                
-                if (quantityEl && priceEl) {
-                    const quantity = parseFloat(quantityEl.value) || 0;
-                    const price = parseFloat(priceEl.value) || 0;
-                    totalAmount += quantity * price;
-                }
-            });
-            
-            document.getElementById('total-items').textContent = totalItems;
-            document.getElementById('total-amount').textContent = `₹${totalAmount.toFixed(2)}`;
+    const itemRows = document.querySelectorAll('.item-row');
+    let totalItems = itemRows.length;
+    let itemsSubtotal = 0;
+    
+    itemRows.forEach((row) => {
+        const itemId = row.id.split('-')[2];
+        const quantityEl = document.getElementById(`item-quantity-${itemId}`);
+        const priceEl = document.getElementById(`item-price-${itemId}`);
+        
+        if (quantityEl && priceEl) {
+            const quantity = parseFloat(quantityEl.value) || 0;
+            const price = parseFloat(priceEl.value) || 0;
+            itemsSubtotal += quantity * price;
         }
+    });
+    
+    const discount = parseFloat(document.getElementById('order-discount')?.value) || 0;
+    const otherCharges = parseFloat(document.getElementById('order-other-charges')?.value) || 0;
+    const finalTotal = itemsSubtotal - discount + otherCharges;
+    
+    document.getElementById('total-items').textContent = totalItems;
+    document.getElementById('items-subtotal').textContent = `₹${itemsSubtotal.toFixed(2)}`;
+    document.getElementById('discount-amount').textContent = `₹${discount.toFixed(2)}`;
+    document.getElementById('other-charges-amount').textContent = `₹${otherCharges.toFixed(2)}`;
+    document.getElementById('total-amount').textContent = `₹${finalTotal.toFixed(2)}`;
+}
+
+// ================= AUTO INVOICE NUMBER GENERATION =================
+async function generateNextInvoiceNumber() {
+  const today = new Date().toISOString().split('T')[0];
+
+  try {
+    // Filter all purchases for today (both local + synced)
+    const todayOrders = purchases.filter(p => p.date === today);
+    const nextNumber = todayOrders.length + 1;
+
+    // Format invoice as: YYYYMMDD-<count>  (e.g., 20251028-3)
+    const invoiceCode = `${today.replace(/-/g, '')}-${nextNumber}`;
+
+    // Auto-fill the invoice field
+    const invoiceInput = document.getElementById('order-invoice');
+    if (invoiceInput) invoiceInput.value = invoiceCode;
+  } catch (err) {
+    console.warn("Failed to auto-generate invoice number:", err);
+  }
+}
+
 
         function saveOrder() {
             // Validate order header
@@ -1390,6 +1529,10 @@ async function syncFromCloudOnLoad() {
             const orderSupplier = document.getElementById('order-supplier').value;
             const orderPayment = document.getElementById('order-payment').value;
             const orderRemarks = document.getElementById('order-remarks').value;
+            const orderDiscount = parseFloat(document.getElementById('order-discount').value) || 0;
+const orderOtherCharges = parseFloat(document.getElementById('order-other-charges').value) || 0;
+const itemsSubtotal = orderItems.reduce((sum, item) => sum + item.totalCost, 0);
+const finalTotal = itemsSubtotal - orderDiscount + orderOtherCharges;
             
             if (!orderDate || !orderInvoice || !orderSupplier || !orderPayment) {
                 alert('Please fill in all required order information fields.');
@@ -1416,18 +1559,26 @@ async function syncFromCloudOnLoad() {
                 }
                 
                 orderItems.push({
-                    date: orderDate,
-                    invoice: orderInvoice,
-                    supplier: orderSupplier,
-                    item: itemName,
-                    category: itemCategory,
-                    quantity: itemQuantity,
-                    unit: itemUnit,
-                    unitPrice: itemPrice,
-                    totalCost: itemQuantity * itemPrice,
-                    paymentMode: orderPayment,
-                    remarks: itemRemarks || orderRemarks
-                });
+    date: orderDate,
+    invoice: orderInvoice,
+payee: document.getElementById('order-payee').value || '',
+otherName: document.getElementById('order-other-name')?.value?.trim() || '',
+paymentMode: document.getElementById('order-payment-mode').value || '',
+
+    supplier: orderSupplier,
+    item: itemName,
+    category: itemCategory,
+    quantity: itemQuantity,
+    unit: itemUnit,
+    unitPrice: itemPrice,
+    totalCost: itemQuantity * itemPrice,
+    paymentMode: orderPayment,
+    remarks: itemRemarks || orderRemarks,
+    discount: orderDiscount / orderItems.length, // Distribute discount across items
+    otherCharges: orderOtherCharges / orderItems.length, // Distribute other charges across items
+    itemsSubtotal: itemsSubtotal,
+    finalOrderTotal: finalTotal
+});
             });
             
             if (!isValid) {
@@ -1445,6 +1596,10 @@ async function syncFromCloudOnLoad() {
             saveData();
             displayRecords();
             updateSummary();
+            updateItemSuggestions();
+            updateSupplierSuggestions();
+
+
             // Auto backup each new item (non-blocking)
             orderItems.forEach(p => backupSingleRecord(p));
             resetOrderForm();
@@ -1464,6 +1619,10 @@ async function syncFromCloudOnLoad() {
             itemCounter = 0;
             addItemRow();
             setTodayDate();
+generateNextInvoiceNumber();
+
+document.getElementById('order-discount').value = '0';
+document.getElementById('order-other-charges').value = '0';
         }
 
         function showTab(tabName, clickedEl) {
@@ -1489,6 +1648,13 @@ async function syncFromCloudOnLoad() {
   if (tabName === 'summary') {
     updateSummary();
   }
+if (tabName === "payeeSummary") {
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("payeeFrom").value = today;
+  document.getElementById("payeeTo").value = today;
+  renderPayeeSummary();
+}
+
 }
 
 
@@ -1521,6 +1687,9 @@ async function syncFromCloudOnLoad() {
                     <td>₹${purchase.unitPrice.toFixed(2)}</td>
                     <td>₹${purchase.totalCost.toFixed(2)}</td>
                     <td>${purchase.paymentMode}</td>
+<td>₹${(purchase.discount || 0).toFixed(2)}</td>
+<td>₹${(purchase.otherCharges || 0).toFixed(2)}</td>
+<td>₹${(purchase.finalOrderTotal || purchase.totalCost).toFixed(2)}</td>
                     <td class="actions">
                         <button class="btn btn-sm btn-primary" onclick="editRecord(${purchases.indexOf(purchase)})">Edit</button>
                         <button class="btn btn-sm btn-danger" onclick="deleteRecord(${purchases.indexOf(purchase)})">Delete</button>
@@ -2250,9 +2419,193 @@ if ("serviceWorker" in navigator) {
     .catch(err => console.error("❌ Service Worker failed:", err));
 }
        
+// ================= ITEM NAME MEMORY & AUTOSUGGEST (CASE-INSENSITIVE, CLOUD SYNCED) =================
+async function updateItemSuggestions() {
+  try {
+    // normalize all names: lowercase + trimmed
+    const uniqueNames = [
+      ...new Set(
+        purchases
+          .map(p => p.item?.trim().toLowerCase())
+          .filter(Boolean)
+      )
+    ];
+
+    for (let name of uniqueNames) {
+      if (!itemSuggestions.map(n => n.toLowerCase()).includes(name)) {
+        await setDoc(doc(itemSuggestionsCollection, name), { createdAt: new Date().toISOString() });
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to update item suggestions:", err);
+  }
+}
+
+function renderItemSuggestions() {
+  const datalist = document.getElementById("item-suggestions");
+  if (!datalist) return;
+  datalist.innerHTML = itemSuggestions
+    .sort((a, b) => a.localeCompare(b))
+    .map(name => `<option value="${name}"></option>`)
+    .join("");
+}
+
+
+// ================= SUPPLIER NAME MEMORY & AUTOSUGGEST (CASE-INSENSITIVE, CLOUD SYNCED) =================
+async function updateSupplierSuggestions() {
+  try {
+    const uniqueSuppliers = [
+      ...new Set(
+        purchases
+          .map(p => p.supplier?.trim().toLowerCase())
+          .filter(Boolean)
+      )
+    ];
+
+    for (let name of uniqueSuppliers) {
+      if (!supplierSuggestions.map(n => n.toLowerCase()).includes(name)) {
+        await setDoc(doc(supplierSuggestionsCollection, name), { createdAt: new Date().toISOString() });
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to update supplier suggestions:", err);
+  }
+}
+
+function renderSupplierSuggestions() {
+  const datalist = document.getElementById("supplier-suggestions");
+  if (!datalist) return;
+  datalist.innerHTML = supplierSuggestions
+    .sort((a, b) => a.localeCompare(b))
+    .map(name => `<option value="${name}"></option>`)
+    .join("");
+}
+
+// ================= PAYEE & PAYMENT MODE LOGIC =================
+const payeeSelect = document.getElementById('order-payee');
+const paymentModeSelect = document.getElementById('order-payment-mode');
+const otherNameContainer = document.getElementById('other-name-container');
+
+if (payeeSelect && paymentModeSelect) {
+  payeeSelect.addEventListener('change', () => {
+    const payee = payeeSelect.value;
+    paymentModeSelect.innerHTML = ''; // reset modes
+    otherNameContainer.style.display = 'none';
+
+    if (payee === 'Shop') {
+  paymentModeSelect.disabled = false;
+  paymentModeSelect.innerHTML = `
+    <option value="Cash">Cash</option>
+    <option value="Online Payment">Online Payment</option>
+  `;
+  paymentModeSelect.value = "Cash";
+}
+ 
+    else if (payee === 'Dyutimala') {
+      paymentModeSelect.disabled = false;
+      paymentModeSelect.innerHTML = `
+        <option value="">Select Payment Mode</option>
+        <option value="Credit Card">Credit Card</option>
+        <option value="Shop Account">Shop's Account</option>
+        <option value="UPI/Debit Card">UPI/Debit Card</option>
+      `;
+    } 
+    else if (payee === 'Others') {
+      paymentModeSelect.disabled = false;
+      paymentModeSelect.innerHTML = `
+        <option value="">Select Payment Mode</option>
+        <option value="Cash">Cash</option>
+        <option value="UPI">UPI</option>
+      `;
+      otherNameContainer.style.display = 'block';
+    }
+  });
+}
+
+// ================= PAYEE SUMMARY LOGIC =================
+function renderPayeeSummary() {
+  const fromDate = document.getElementById("payeeFrom").value || "0000-00-00";
+  const toDate = document.getElementById("payeeTo").value || "9999-12-31";
+  const tbody = document.querySelector("#payeeSummaryTable tbody");
+  tbody.innerHTML = "";
+
+  const filtered = purchases.filter(p => p.date >= fromDate && p.date <= toDate);
+
+  const summaryMap = {};
+
+  filtered.forEach(p => {
+    const payee = (p.payee || "Unknown").trim();
+    const paymentMode = (p.paymentMode || "Unknown").trim();
+    const otherName = (p.otherName || "").trim();
+    const key = `${payee}|${otherName}|${paymentMode}`;
+
+    if (!summaryMap[key]) {
+      summaryMap[key] = { payee, otherName, paymentMode, total: 0, count: 0 };
+    }
+    summaryMap[key].total += parseFloat(p.amount || 0);
+    summaryMap[key].count++;
+  });
+
+  const entries = Object.values(summaryMap).sort((a, b) =>
+    a.payee.localeCompare(b.payee) || a.paymentMode.localeCompare(b.paymentMode)
+  );
+
+  entries.forEach(e => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${e.payee}</td>
+      <td>${e.otherName}</td>
+      <td>${e.paymentMode}</td>
+      <td>${e.total.toFixed(2)}</td>
+      <td>${e.count}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  if (entries.length === 0) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="5" style="text-align:center;">No records found</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+// ================= EXPORT PAYEE SUMMARY TO EXCEL =================
+function exportPayeeSummaryToExcel() {
+  const table = document.getElementById("payeeSummaryTable");
+  const rows = Array.from(table.querySelectorAll("tr"));
+  if (rows.length <= 1) {
+    alert("No data available to export.");
+    return;
+  }
+
+  // Construct CSV text (Excel-compatible)
+  let csv = [];
+  rows.forEach(row => {
+    const cols = Array.from(row.querySelectorAll("th, td"))
+      .map(col => `"${col.innerText.replace(/"/g, '""')}"`);
+    csv.push(cols.join(","));
+  });
+
+  const csvString = csv.join("\n");
+  const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  const today = new Date().toISOString().split("T")[0];
+  a.href = url;
+  a.download = `Payee_Summary_${today}.xlsx`;  // Excel-friendly CSV
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 
     </script>
 
   </div>
+<datalist id="item-suggestions"></datalist>
+<datalist id="supplier-suggestions"></datalist>
+
 </body>
 </html>
