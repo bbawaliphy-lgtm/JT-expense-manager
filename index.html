@@ -1048,17 +1048,17 @@ body {
 
   <div class="form-group">
     <label>Opening Balance</label>
-    <input type="number" id="openingBalance" step="0.01">
+    <input type="number" id="openingBalance" oninput="calculateCashBox()" step="0.01" placeholder="Opening Balance">
   </div>
 
   <div class="form-group">
     <label>Total Sale</label>
-    <input type="number" id="totalSale" step="0.01" oninput="calculateCashBox()">
+    <input type="number" id="totalSale" oninput="calculateCashBox()" step="0.01" placeholder="Total Sale">
   </div>
 
   <div class="form-group">
     <label>Online Payments</label>
-    <input type="number" id="onlinePayments" step="0.01" oninput="calculateCashBox()">
+    <input type="number" id="onlinePayments" oninput="calculateCashBox()" step="0.01" placeholder="Online Payments">
   </div>
 
   <div class="form-group">
@@ -1068,8 +1068,8 @@ body {
 
   <div class="form-group">
     <label>Cash Expenses</label>
-    <div id="expenseList"></div>
     <button class="btn btn-secondary" onclick="addExpenseItem()">+ Add Expense</button>
+<div id="expenseList"></div>
   </div>
 
   <div class="form-group">
@@ -2821,6 +2821,17 @@ async function saveCashBoxRecord() {
     alert("Error saving cash box record.");
   }
 }
+
+// ===== make module functions available to inline HTML =====
+window.addExpenseItem = addExpenseItem;
+window.removeExpenseItem = removeExpenseItem;
+window.calculateCashBox = calculateCashBox;
+window.compareCashBox = compareCashBox;
+window.saveCashBoxRecord = saveCashBoxRecord;
+window.openCashBoxTab = openCashBoxTab || ( () => fetchCashBoxRecords && fetchCashBoxRecords() );
+window.filterCashBoxHistory = filterCashBoxHistory || (()=>{});
+window.exportCashBoxToExcel = exportCashBoxToExcel || (()=>{});
+
 
 // Fetch and display records
 async function fetchCashBoxRecords() {
