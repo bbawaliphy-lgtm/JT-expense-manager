@@ -1631,36 +1631,45 @@ document.getElementById('order-other-charges').value = '0';
         }
 
         function showTab(tabName, clickedEl) {
-  // hide all tabs & deactivate all nav buttons
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  // Hide all tabs & deactivate all nav buttons
+  document.querySelectorAll('.tab-content').forEach(t => {
+    t.classList.remove('active');
+    t.style.display = 'none'; // override inline display:none
+  });
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
 
-  // show selected tab
+  // Show selected tab
   const tab = document.getElementById(`${tabName}-tab`);
-  if (tab) tab.classList.add('active');
+  if (tab) {
+    tab.style.display = 'block';   // force visible
+    tab.classList.add('active');
+  } else {
+    console.warn(`showTab: tab element not found: ${tabName}-tab`);
+  }
 
-  // mark the clicked nav button active if provided,
-  // otherwise try to find a matching nav button
+  // Highlight clicked button
   if (clickedEl && clickedEl.classList) {
     clickedEl.classList.add('active');
   } else {
-    // attempt to find button with onclick that calls this tab
     const selector = `.nav-tab[onclick*="showTab('${tabName}')"], .nav-tab[onclick*='showTab("${tabName}")']`;
     const btn = document.querySelector(selector);
     if (btn) btn.classList.add('active');
   }
 
+  // Tab-specific actions
   if (tabName === 'summary') {
     updateSummary();
   }
-if (tabName === "payeeSummary") {
-  const today = new Date().toISOString().split("T")[0];
-  document.getElementById("payeeFrom").value = today;
-  document.getElementById("payeeTo").value = today;
-  renderPayeeSummary();
+  if (tabName === 'payeeSummary') {
+    const today = new Date().toISOString().split("T")[0];
+    const elFrom = document.getElementById("payeeFrom");
+    const elTo = document.getElementById("payeeTo");
+    if (elFrom) elFrom.value = today;
+    if (elTo) elTo.value = today;
+    if (typeof renderPayeeSummary === 'function') renderPayeeSummary();
+  }
 }
 
-}
 
 
         function displayRecords() {
