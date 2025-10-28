@@ -987,7 +987,7 @@ body {
     </div>
 
 <!-- ================= PAYEE SUMMARY SECTION ================= -->
-<div id="payeeSummary" class="tab-content" style="display:none;">
+<div id="payeeSummary-tab" class="tab-content" style="display:none;">
   <h2>Payee Summary</h2>
 
   <div style="margin-bottom:10px;">
@@ -1558,21 +1558,21 @@ async function generateNextInvoiceNumber() {
         }
 
         orderItems.push({
-            date: orderDate,
-            invoice: orderInvoice,
-            payee: document.getElementById('order-payee').value || '',
-            otherName: document.getElementById('order-other-name')?.value?.trim() || '',
-            paymentMode: document.getElementById('order-payment-mode').value || '',
-            supplier: orderSupplier,
-            item: itemName,
-            category: itemCategory,
-            quantity: itemQuantity,
-            unit: itemUnit,
-            unitPrice: itemPrice,
-            totalCost: itemQuantity * itemPrice,
-            paymentMode: orderPayment,
-            remarks: itemRemarks || orderRemarks
-        });
+    date: orderDate,
+    invoice: orderInvoice,
+    payee: document.getElementById('order-payee').value || '',
+    otherName: document.getElementById('order-other-name')?.value?.trim() || '',
+    paymentMode: document.getElementById('order-payment-mode').value || '',
+    supplier: orderSupplier,
+    item: itemName,
+    category: itemCategory,
+    quantity: itemQuantity,
+    unit: itemUnit,
+    unitPrice: itemPrice,
+    totalCost: itemQuantity * itemPrice,
+    amount: itemQuantity * itemPrice,  // ← ADD THIS LINE
+    remarks: itemRemarks || orderRemarks
+});
     });
 
     if (!isValid) {
@@ -2411,6 +2411,9 @@ window.editRecord = editRecord;
 window.deleteRecord = deleteRecord;
 window.closeEditModal = closeEditModal;
 window.redownloadBackup = redownloadBackup;
+
+window.renderPayeeSummary = renderPayeeSummary;
+window.exportPayeeSummaryToExcel = exportPayeeSummaryToExcel;
 
 // Expose new helpers if you want to call them manually
 window.backupSingleRecord = backupSingleRecord;
