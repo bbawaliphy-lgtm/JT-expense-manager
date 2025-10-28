@@ -737,6 +737,8 @@ body {
             <button class="nav-tab" onclick="showTab('view')">View Records</button>
             <button class="nav-tab" onclick="showTab('summary')">Summary</button>
             <button class="nav-tab" onclick="showTab('payeeSummary')">Payee Summary</button>
+<button class="nav-tab" onclick="showTab('cashBox')">Cash Box</button>
+
 
         </div>
 
@@ -1036,6 +1038,88 @@ body {
   </div>
 </div>
 
+<!-- 🔹 CASH BOX TAB -->
+<div id="cashBox-tab" class="tab-content" style="display:none; padding:20px;">
+  <h2>💰 Cash Box Calculator</h2>
+  <div class="form-group">
+    <label>Date</label>
+    <input type="date" id="cashDate">
+  </div>
+
+  <div class="form-group">
+    <label>Opening Balance</label>
+    <input type="number" id="openingBalance" step="0.01">
+  </div>
+
+  <div class="form-group">
+    <label>Total Sale</label>
+    <input type="number" id="totalSale" step="0.01" oninput="calculateCashBox()">
+  </div>
+
+  <div class="form-group">
+    <label>Online Payments</label>
+    <input type="number" id="onlinePayments" step="0.01" oninput="calculateCashBox()">
+  </div>
+
+  <div class="form-group">
+    <label>Cash Sale (Auto Calculated)</label>
+    <input type="number" id="cashSale" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Cash Expenses</label>
+    <div id="expenseList"></div>
+    <button class="btn btn-secondary" onclick="addExpenseItem()">+ Add Expense</button>
+  </div>
+
+  <div class="form-group">
+    <label>Total Expenses</label>
+    <input type="text" id="totalExpenses" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Expected Closing Balance</label>
+    <input type="text" id="expectedClosing" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Actual Counted Amount</label>
+    <input type="number" id="actualAmount" oninput="compareCashBox()">
+  </div>
+
+  <div id="matchStatus"></div>
+
+  <button class="btn btn-primary" onclick="saveCashBoxRecord()">💾 Save Record</button>
+
+<hr style="margin:20px 0;">
+
+<h3>📜 Cash Box History</h3>
+
+<div style="margin-bottom:10px;">
+  <label>Search by Date:</label>
+  <input type="date" id="searchCashDate" onchange="filterCashBoxHistory()">
+  <button onclick="exportCashBoxToExcel()" style="background:green;color:white;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;">📊 Export to Excel</button>
+</div>
+
+<div style="overflow-x:auto;">
+  <table id="cashBoxHistoryTable" border="1" style="width:100%;border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Opening Balance</th>
+        <th>Total Sale</th>
+        <th>Online</th>
+        <th>Cash Sale</th>
+        <th>Expenses</th>
+        <th>Expected</th>
+        <th>Actual</th>
+        <th>Difference</th>
+      </tr>
+    </thead>
+    <tbody id="cashBoxHistoryBody"></tbody>
+  </table>
+</div>
+</div>
 
 
     <!-- Edit Modal -->
@@ -1685,6 +1769,10 @@ document.getElementById('order-other-charges').value = '0';
   if (tabName === 'summary') {
     updateSummary();
   }
+if (tabName === 'cashBox') {
+  openCashBoxTab();
+}
+
   if (tabName === 'payeeSummary') {
     const today = new Date().toISOString().split("T")[0];
     const elFrom = document.getElementById("filterFrom");
@@ -2637,6 +2725,184 @@ function exportPayeeSummaryToExcel() {
   URL.revokeObjectURL(url);
 }
 
+// ================== CASH BOX FEATURE (Upgraded) ==================
+let cashExpenses = [];
+let cashBoxRecords = [];
+
+// Firebase reference
+const cashBoxCollection = collection(db, "cashBoxRecords");
+
+// Add new expense input row
+function addExpenseItem() {
+  const container = document.getElementById('expenseList');
+  const index = cashExpenses.length;
+  const row = document.createElement('div');
+  row.className = 'expense-item';
+  row.innerHTML = `
+    <input type="text" id="expDesc${index}" placeholder="Description">
+    <input type="number" id="expAmt${index}" step="0.01" placeholder="Amount" oninput="calculateCashBox()">
+    <button class="btn btn-danger btn-small" onclick="removeExpenseItem(${index})">Remove</button>
+  `;
+  container.appendChild(row);
+  cashExpenses.push({ description: '', amount: 0 });
+}
+
+function removeExpenseItem(i) {
+  const row = document.getElementById(`expDesc${i}`)?.parentElement;
+  if (row) row.remove();
+  cashExpenses.splice(i, 1);
+  calculateCashBox();
+}
+
+// Main calculator logic
+function calculateCashBox() {
+  const totalSale = parseFloat(document.getElementById('totalSale').value) || 0;
+  const onlinePayments = parseFloat(document.getElementById('onlinePayments').value) || 0;
+  const openingBalance = parseFloat(document.getElementById('openingBalance').value) || 0;
+
+  const cashSale = totalSale - onlinePayments;
+  document.getElementById('cashSale').value = cashSale.toFixed(2);
+
+  let totalExp = 0;
+  cashExpenses.forEach((_, i) => {
+    totalExp += parseFloat(document.getElementById(`expAmt${i}`)?.value) || 0;
+  });
+  document.getElementById('totalExpenses').value = totalExp.toFixed(2);
+
+  const expected = openingBalance + cashSale - totalExp;
+  document.getElementById('expectedClosing').value = expected.toFixed(2);
+
+  compareCashBox();
+}
+
+// Compare expected vs actual
+function compareCashBox() {
+  const expected = parseFloat(document.getElementById('expectedClosing').value) || 0;
+  const actual = parseFloat(document.getElementById('actualAmount').value) || 0;
+  const diff = actual - expected;
+  const msgEl = document.getElementById('matchStatus');
+
+  if (!document.getElementById('actualAmount').value) {
+    msgEl.innerHTML = '';
+    return;
+  }
+
+  if (Math.abs(diff) < 0.01) {
+    msgEl.innerHTML = `<div style="background:#d4edda;color:#155724;padding:10px;border-radius:5px;">✓ MATCH! Amounts are equal.</div>`;
+  } else if (diff > 0) {
+    msgEl.innerHTML = `<div style="background:#fff3cd;color:#856404;padding:10px;border-radius:5px;">Excess: ₹${diff.toFixed(2)}</div>`;
+  } else {
+    msgEl.innerHTML = `<div style="background:#f8d7da;color:#721c24;padding:10px;border-radius:5px;">Shortage: ₹${Math.abs(diff).toFixed(2)}</div>`;
+  }
+}
+
+// Save Cash Box Record to Firestore
+async function saveCashBoxRecord() {
+  const record = {
+    date: document.getElementById('cashDate').value,
+    openingBalance: parseFloat(document.getElementById('openingBalance').value) || 0,
+    totalSale: parseFloat(document.getElementById('totalSale').value) || 0,
+    onlinePayments: parseFloat(document.getElementById('onlinePayments').value) || 0,
+    cashSale: parseFloat(document.getElementById('cashSale').value) || 0,
+    totalExpenses: parseFloat(document.getElementById('totalExpenses').value) || 0,
+    expectedClosing: parseFloat(document.getElementById('expectedClosing').value) || 0,
+    actualAmount: parseFloat(document.getElementById('actualAmount').value) || 0,
+    difference: (parseFloat(document.getElementById('actualAmount').value) || 0) -
+                (parseFloat(document.getElementById('expectedClosing').value) || 0),
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    await addDoc(cashBoxCollection, record);
+    alert("💾 Cash box record saved and synced!");
+    fetchCashBoxRecords(); // Refresh history after save
+  } catch (err) {
+    console.error("Error saving cash box:", err);
+    alert("Error saving cash box record.");
+  }
+}
+
+// Fetch and display records
+async function fetchCashBoxRecords() {
+  try {
+    const snapshot = await getDocs(cashBoxCollection);
+    cashBoxRecords = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderCashBoxHistory(cashBoxRecords);
+  } catch (err) {
+    console.error("Error loading cash box data:", err);
+  }
+}
+
+// Render Cash Box table
+function renderCashBoxHistory(records) {
+  const tbody = document.getElementById("cashBoxHistoryBody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  if (records.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">No records available</td></tr>`;
+    return;
+  }
+
+  records.sort((a, b) => new Date(b.date) - new Date(a.date));
+  records.forEach(r => {
+    const diff = (r.actualAmount - r.expectedClosing).toFixed(2);
+    const color = diff == 0 ? "#d4edda" : diff > 0 ? "#fff3cd" : "#f8d7da";
+    const row = `<tr style="background:${color}">
+      <td>${r.date}</td>
+      <td>${r.openingBalance.toFixed(2)}</td>
+      <td>${r.totalSale.toFixed(2)}</td>
+      <td>${r.onlinePayments.toFixed(2)}</td>
+      <td>${r.cashSale.toFixed(2)}</td>
+      <td>${r.totalExpenses.toFixed(2)}</td>
+      <td>${r.expectedClosing.toFixed(2)}</td>
+      <td>${r.actualAmount.toFixed(2)}</td>
+      <td>${diff}</td>
+    </tr>`;
+    tbody.insertAdjacentHTML("beforeend", row);
+  });
+}
+
+// Filter records by date
+function filterCashBoxHistory() {
+  const date = document.getElementById("searchCashDate").value;
+  if (!date) {
+    renderCashBoxHistory(cashBoxRecords);
+    return;
+  }
+  const filtered = cashBoxRecords.filter(r => r.date === date);
+  renderCashBoxHistory(filtered);
+}
+
+// Export to Excel (CSV format)
+function exportCashBoxToExcel() {
+  const table = document.getElementById("cashBoxHistoryTable");
+  const rows = Array.from(table.querySelectorAll("tr"));
+  if (rows.length <= 1) {
+    alert("No data to export.");
+    return;
+  }
+
+  const csv = rows.map(row => {
+    return Array.from(row.querySelectorAll("th, td"))
+      .map(col => `"${col.innerText.replace(/"/g, '""')}"`).join(",");
+  }).join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `CashBox_${new Date().toISOString().split("T")[0]}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Initialize when tab opens
+function openCashBoxTab() {
+  fetchCashBoxRecords();
+}
 
     </script>
 
