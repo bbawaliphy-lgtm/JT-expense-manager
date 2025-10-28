@@ -1522,90 +1522,96 @@ async function generateNextInvoiceNumber() {
 }
 
 
-        function saveOrder() {
-            // Validate order header
-            const orderDate = document.getElementById('order-date').value;
-            const orderInvoice = document.getElementById('order-invoice').value;
-            const orderSupplier = document.getElementById('order-supplier').value;
-            const orderPayment = document.getElementById('order-payment').value;
-            const orderRemarks = document.getElementById('order-remarks').value;
-            const orderDiscount = parseFloat(document.getElementById('order-discount').value) || 0;
-const orderOtherCharges = parseFloat(document.getElementById('order-other-charges').value) || 0;
-const itemsSubtotal = orderItems.reduce((sum, item) => sum + item.totalCost, 0);
-const finalTotal = itemsSubtotal - orderDiscount + orderOtherCharges;
-            
-            if (!orderDate || !orderInvoice || !orderSupplier || !orderPayment) {
-                alert('Please fill in all required order information fields.');
-                return;
-            }
-            
-            // Validate and collect items
-            const itemRows = document.querySelectorAll('.item-row');
-            const orderItems = [];
-            let isValid = true;
-            
-            itemRows.forEach((row) => {
-                const itemId = row.id.split('-')[2];
-                const itemName = document.getElementById(`item-name-${itemId}`)?.value;
-                const itemCategory = document.getElementById(`item-category-${itemId}`)?.value;
-                const itemQuantity = parseFloat(document.getElementById(`item-quantity-${itemId}`)?.value);
-                const itemUnit = document.getElementById(`item-unit-${itemId}`)?.value;
-                const itemPrice = parseFloat(document.getElementById(`item-price-${itemId}`)?.value);
-                const itemRemarks = document.getElementById(`item-remarks-${itemId}`)?.value;
-                
-                if (!itemName || !itemCategory || !itemQuantity || !itemUnit || !itemPrice) {
-                    isValid = false;
-                    return;
-                }
-                
-                orderItems.push({
-    date: orderDate,
-    invoice: orderInvoice,
-payee: document.getElementById('order-payee').value || '',
-otherName: document.getElementById('order-other-name')?.value?.trim() || '',
-paymentMode: document.getElementById('order-payment-mode').value || '',
+       function saveOrder() {
+    // Validate order header
+    const orderDate = document.getElementById('order-date').value;
+    const orderInvoice = document.getElementById('order-invoice').value;
+    const orderSupplier = document.getElementById('order-supplier').value;
+    const orderPayment = document.getElementById('order-payment').value;
+    const orderRemarks = document.getElementById('order-remarks').value;
+    const orderDiscount = parseFloat(document.getElementById('order-discount').value) || 0;
+    const orderOtherCharges = parseFloat(document.getElementById('order-other-charges').value) || 0;
 
-    supplier: orderSupplier,
-    item: itemName,
-    category: itemCategory,
-    quantity: itemQuantity,
-    unit: itemUnit,
-    unitPrice: itemPrice,
-    totalCost: itemQuantity * itemPrice,
-    paymentMode: orderPayment,
-    remarks: itemRemarks || orderRemarks,
-    discount: orderDiscount / orderItems.length, // Distribute discount across items
-    otherCharges: orderOtherCharges / orderItems.length, // Distribute other charges across items
-    itemsSubtotal: itemsSubtotal,
-    finalOrderTotal: finalTotal
-});
-            });
-            
-            if (!isValid) {
-                alert('Please fill in all required item fields.');
-                return;
-            }
-            
-            if (orderItems.length === 0) {
-                alert('Please add at least one item to the order.');
-                return;
-            }
-            
-            // Add all items to purchases
-            purchases = [...purchases, ...orderItems];
-            saveData();
-            displayRecords();
-            updateSummary();
-            updateItemSuggestions();
-            updateSupplierSuggestions();
+    if (!orderDate || !orderInvoice || !orderSupplier || !orderPayment) {
+        alert('Please fill in all required order information fields.');
+        return;
+    }
 
+    // ✅ Initialize before usage
+    const orderItems = [];
+    let isValid = true;
 
-            // Auto backup each new item (non-blocking)
-            orderItems.forEach(p => backupSingleRecord(p));
-            resetOrderForm();
-            
-            alert(`Order saved successfully! Added ${orderItems.length} items to inventory.`);
+    // Validate and collect items
+    const itemRows = document.querySelectorAll('.item-row');
+    itemRows.forEach((row) => {
+        const itemId = row.id.split('-')[2];
+        const itemName = document.getElementById(`item-name-${itemId}`)?.value;
+        const itemCategory = document.getElementById(`item-category-${itemId}`)?.value;
+        const itemQuantity = parseFloat(document.getElementById(`item-quantity-${itemId}`)?.value);
+        const itemUnit = document.getElementById(`item-unit-${itemId}`)?.value;
+        const itemPrice = parseFloat(document.getElementById(`item-price-${itemId}`)?.value);
+        const itemRemarks = document.getElementById(`item-remarks-${itemId}`)?.value;
+
+        if (!itemName || !itemCategory || !itemQuantity || !itemUnit || !itemPrice) {
+            isValid = false;
+            return;
         }
+
+        orderItems.push({
+            date: orderDate,
+            invoice: orderInvoice,
+            payee: document.getElementById('order-payee').value || '',
+            otherName: document.getElementById('order-other-name')?.value?.trim() || '',
+            paymentMode: document.getElementById('order-payment-mode').value || '',
+            supplier: orderSupplier,
+            item: itemName,
+            category: itemCategory,
+            quantity: itemQuantity,
+            unit: itemUnit,
+            unitPrice: itemPrice,
+            totalCost: itemQuantity * itemPrice,
+            paymentMode: orderPayment,
+            remarks: itemRemarks || orderRemarks
+        });
+    });
+
+    if (!isValid) {
+        alert('Please fill in all required item fields.');
+        return;
+    }
+
+    if (orderItems.length === 0) {
+        alert('Please add at least one item to the order.');
+        return;
+    }
+
+    // ✅ Now safe to calculate totals
+    const itemsSubtotal = orderItems.reduce((sum, item) => sum + item.totalCost, 0);
+    const finalTotal = itemsSubtotal - orderDiscount + orderOtherCharges;
+
+    // Distribute totals among items
+    orderItems.forEach(i => {
+        i.discount = orderDiscount / orderItems.length;
+        i.otherCharges = orderOtherCharges / orderItems.length;
+        i.itemsSubtotal = itemsSubtotal;
+        i.finalOrderTotal = finalTotal;
+    });
+
+    // Add all items to purchases
+    purchases = [...purchases, ...orderItems];
+    saveData();
+    displayRecords();
+    updateSummary();
+    updateItemSuggestions();
+    updateSupplierSuggestions();
+
+    // Auto backup each new item (non-blocking)
+    orderItems.forEach(p => backupSingleRecord(p));
+    resetOrderForm();
+
+    alert(`✅ Order saved successfully! Added ${orderItems.length} items to inventory.`);
+}
+
 
         function resetOrderForm() {
             document.getElementById('order-date').value = '';
