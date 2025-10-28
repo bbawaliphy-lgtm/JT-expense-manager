@@ -1240,17 +1240,10 @@ async function backupSingleRecord(p) {
 let lastBackupTimestamp = null;
 let lastSaveTimestamp = null;
 
-// Ensure anonymous sign-in finished (best-effort)
-async function ensureSignedIn() {
-    if (!auth || !auth.currentUser) {
-        try { await signInAnonymously(auth); } catch (e) { console.warn("Anonymous sign-in failed:", e); }
-    }
-}
 
 // On load: if cloud has any records, replace local data with cloud (mirror)
 async function syncFromCloudOnLoad() {
     try {
-        await ensureSignedIn();
         const snapshot = await getDocs(purchasesCollection);
         const restored = [];
         snapshot.forEach(docSnap => restored.push(docSnap.data()));
