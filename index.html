@@ -1142,10 +1142,16 @@ const purchasesCollection = collection(db, "purchases");
 const itemSuggestionsCollection = collection(db, "itemSuggestions");
 const supplierSuggestionsCollection = collection(db, "supplierSuggestions");
 
+// ===== SETUP FIRESTORE LISTENERS (ONLY AFTER LOGIN) =====
+let listenersInitialized = false;
 
+function setupFirestoreListeners() {
+  // Prevent setting up listeners multiple times
+  if (listenersInitialized) return;
+  listenersInitialized = true;
 
-// ===== REAL-TIME SYNC LISTENER =====
-onSnapshot(purchasesCollection, snapshot => {
+  // ===== REAL-TIME SYNC LISTENER =====
+  onSnapshot(purchasesCollection, snapshot => {
     let cloudData = [];
     snapshot.forEach(docSnap => cloudData.push(docSnap.data()));
 
@@ -1156,31 +1162,28 @@ onSnapshot(purchasesCollection, snapshot => {
     updateSummary();
 
     console.log("🔄 Local data updated in real-time from Firestore.");
-});
-
-// ===== REAL-TIME SYNC FOR ITEM SUGGESTIONS =====
-let itemSuggestions = [];
-
-onSnapshot(itemSuggestionsCollection, snapshot => {
-  itemSuggestions = [];
-  snapshot.forEach(docSnap => {
-    itemSuggestions.push(docSnap.id); // using document ID as item name
   });
-  renderItemSuggestions(); // refresh datalist options
-  console.log("🔄 Item suggestions updated from Firestore:", itemSuggestions.length);
-});
 
-// ===== REAL-TIME SYNC FOR SUPPLIER SUGGESTIONS =====
-let supplierSuggestions = [];
-
-onSnapshot(supplierSuggestionsCollection, snapshot => {
-  supplierSuggestions = [];
-  snapshot.forEach(docSnap => {
-    supplierSuggestions.push(docSnap.id);
+  // ===== REAL-TIME SYNC FOR ITEM SUGGESTIONS =====
+  onSnapshot(itemSuggestionsCollection, snapshot => {
+    itemSuggestions = [];
+    snapshot.forEach(docSnap => {
+      itemSuggestions.push(docSnap.id);
+    });
+    renderItemSuggestions();
+    console.log("🔄 Item suggestions updated from Firestore:", itemSuggestions.length);
   });
-  renderSupplierSuggestions();
-  console.log("🔄 Supplier suggestions updated from Firestore:", supplierSuggestions.length);
-});
+
+  // ===== REAL-TIME SYNC FOR SUPPLIER SUGGESTIONS =====
+  onSnapshot(supplierSuggestionsCollection, snapshot => {
+    supplierSuggestions = [];
+    snapshot.forEach(docSnap => {
+      supplierSuggestions.push(docSnap.id);
+    });
+    renderSupplierSuggestions();
+    console.log("🔄 Supplier suggestions updated from Firestore:", supplierSuggestions.length);
+  });
+}
 
 
            // ===== AUTHENTICATION HANDLING =====
@@ -1208,6 +1211,9 @@ onAuthStateChanged(auth, (user) => {
     // ✅ Logged in: hide login, show app
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("app-screen").style.display = "block";
+    
+    // ✅ NOW SET UP FIRESTORE LISTENERS (only when logged in)
+    setupFirestoreListeners();
   } else {
     // ❌ Not logged in: keep login screen centered
     document.getElementById("login-screen").style.display = "flex"; 
