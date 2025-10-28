@@ -657,6 +657,16 @@ body {
     color: white;
 }
 
+#payeeSummaryTable th {
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+  padding: 6px;
+}
+#payeeSummaryTable td {
+  text-align: center;
+  padding: 6px;
+}
 
         .backup-controls {
             display: flex;
@@ -727,6 +737,7 @@ body {
             <button class="nav-tab" onclick="showTab('view')">View Records</button>
             <button class="nav-tab" onclick="showTab('summary')">Summary</button>
             <button class="nav-tab" onclick="showTab('payeeSummary')">Payee Summary</button>
+
         </div>
 
         <!-- Add Purchase Tab -->
@@ -986,31 +997,45 @@ body {
         </div>
     </div>
 
-<!-- ================= PAYEE SUMMARY SECTION ================= -->
-<div id="payeeSummary-tab" class="tab-content" style="display:none;">
+<!-- 🔹 PAYEE SUMMARY TAB -->
+<div id="payeeSummary-tab" class="tab-content" style="display:none; padding:15px;">
   <h2>Payee Summary</h2>
 
   <div style="margin-bottom:10px;">
-    <label>From: <input type="date" id="payeeFrom"></label>
-    <label>To: <input type="date" id="payeeTo"></label>
-    <button class="action-btn" onclick="renderPayeeSummary()">Filter</button>
-<button class="action-btn" onclick="exportPayeeSummaryToExcel()">Export to Excel</button>
+    <label>Filter Payee:</label>
+    <select id="filterPayee" onchange="renderPayeeSummary()" style="padding:4px 6px;">
+      <option value="All">All</option>
+      <option value="Shop">Shop</option>
+      <option value="Dyutimala">Dyutimala</option>
+      <option value="Others">Others</option>
+    </select>
 
+    <label style="margin-left:15px;">From:</label>
+    <input type="date" id="filterFrom" onchange="renderPayeeSummary()" style="padding:4px;">
+
+    <label style="margin-left:5px;">To:</label>
+    <input type="date" id="filterTo" onchange="renderPayeeSummary()" style="padding:4px;">
+
+    <button onclick="exportPayeeSummaryToExcel()" style="margin-left:15px;background:green;color:white;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;">
+      📊 Export to Excel
+    </button>
   </div>
 
-  <table id="payeeSummaryTable" border="1" cellspacing="0" cellpadding="6" width="100%">
-    <thead style="background:#f0f0f0;">
-      <tr>
-        <th>Payee</th>
-        <th>Other Name</th>
-        <th>Payment Mode</th>
-        <th>Total Spent (₹)</th>
-        <th>Orders</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div style="overflow-x:auto;">
+    <table id="payeeSummaryTable" border="1" style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th>Payee</th>
+          <th>Payment Mode</th>
+          <th>Orders</th>
+          <th>Total (₹)</th>
+        </tr>
+      </thead>
+      <tbody id="payee-summary-body"></tbody>
+    </table>
+  </div>
 </div>
+
 
 
     <!-- Edit Modal -->
@@ -1662,12 +1687,12 @@ document.getElementById('order-other-charges').value = '0';
   }
   if (tabName === 'payeeSummary') {
     const today = new Date().toISOString().split("T")[0];
-    const elFrom = document.getElementById("payeeFrom");
-    const elTo = document.getElementById("payeeTo");
+    const elFrom = document.getElementById("filterFrom");
+    const elTo = document.getElementById("filterTo");
     if (elFrom) elFrom.value = today;
     if (elTo) elTo.value = today;
     if (typeof renderPayeeSummary === 'function') renderPayeeSummary();
-  }
+}
 }
 
 
@@ -2541,79 +2566,74 @@ if (payeeSelect && paymentModeSelect) {
 
 // ================= PAYEE SUMMARY LOGIC =================
 function renderPayeeSummary() {
-  const fromDate = document.getElementById("payeeFrom").value || "0000-00-00";
-  const toDate = document.getElementById("payeeTo").value || "9999-12-31";
-  const tbody = document.querySelector("#payeeSummaryTable tbody");
+  const tbody = document.getElementById("payee-summary-body");
+  if (!tbody) return;
+
+  const payeeFilter = document.getElementById("filterPayee").value;
+  const fromDate = document.getElementById("filterFrom").value;
+  const toDate = document.getElementById("filterTo").value;
+
+  const filtered = purchases.filter(p => {
+    if (!p.payee) return false;
+
+    const passPayee = payeeFilter === "All" || p.payee === payeeFilter;
+    const passFrom = !fromDate || new Date(p.date) >= new Date(fromDate);
+    const passTo = !toDate || new Date(p.date) <= new Date(toDate);
+    return passPayee && passFrom && passTo;
+  });
+
+  const summary = {};
+  filtered.forEach(p => {
+    const key = `${p.payee}-${p.paymentMode}`;
+    if (!summary[key]) summary[key] = { payee: p.payee, paymentMode: p.paymentMode, orders: 0, total: 0 };
+    summary[key].orders += 1;
+    summary[key].total += parseFloat(p.finalOrderTotal || p.totalCost || 0);
+  });
+
   tbody.innerHTML = "";
 
-  const filtered = purchases.filter(p => p.date >= fromDate && p.date <= toDate);
-
-  const summaryMap = {};
-
-  filtered.forEach(p => {
-    const payee = (p.payee || "Unknown").trim();
-    const paymentMode = (p.paymentMode || "Unknown").trim();
-    const otherName = (p.otherName || "").trim();
-    const key = `${payee}|${otherName}|${paymentMode}`;
-
-    if (!summaryMap[key]) {
-      summaryMap[key] = { payee, otherName, paymentMode, total: 0, count: 0 };
-    }
-    summaryMap[key].total += parseFloat(p.amount || 0);
-    summaryMap[key].count++;
-  });
-
-  const entries = Object.values(summaryMap).sort((a, b) =>
-    a.payee.localeCompare(b.payee) || a.paymentMode.localeCompare(b.paymentMode)
-  );
-
-  entries.forEach(e => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${e.payee}</td>
-      <td>${e.otherName}</td>
-      <td>${e.paymentMode}</td>
-      <td>${e.total.toFixed(2)}</td>
-      <td>${e.count}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  if (entries.length === 0) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td colspan="5" style="text-align:center;">No records found</td>`;
-    tbody.appendChild(tr);
+  const keys = Object.keys(summary);
+  if (keys.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No records found</td></tr>`;
+    return;
   }
+
+  keys.forEach(key => {
+    const { payee, paymentMode, orders, total } = summary[key];
+    const row = `<tr>
+      <td>${payee}</td>
+      <td>${paymentMode}</td>
+      <td>${orders}</td>
+      <td>${total.toFixed(2)}</td>
+    </tr>`;
+    tbody.insertAdjacentHTML("beforeend", row);
+  });
 }
 
 // ================= EXPORT PAYEE SUMMARY TO EXCEL =================
 function exportPayeeSummaryToExcel() {
   const table = document.getElementById("payeeSummaryTable");
-  const rows = Array.from(table.querySelectorAll("tr"));
-  if (rows.length <= 1) {
+  const visibleRows = Array.from(table.querySelectorAll("tr")).filter(r => r.offsetParent !== null);
+  if (visibleRows.length <= 1) {
     alert("No data available to export.");
     return;
   }
 
-  // Construct CSV text (Excel-compatible)
   let csv = [];
-  rows.forEach(row => {
+  visibleRows.forEach(row => {
     const cols = Array.from(row.querySelectorAll("th, td"))
       .map(col => `"${col.innerText.replace(/"/g, '""')}"`);
     csv.push(cols.join(","));
   });
 
-  const csvString = csv.join("\n");
-  const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  const today = new Date().toISOString().split("T")[0];
-  a.href = url;
-  a.download = `Payee_Summary_${today}.xlsx`;  // Excel-friendly CSV
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `Payee_Summary_${new Date().toISOString().split("T")[0]}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
 
