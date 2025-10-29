@@ -1114,6 +1114,7 @@ body {
         <th>Expected</th>
         <th>Actual</th>
         <th>Difference</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody id="cashBoxHistoryBody"></tbody>
@@ -2814,13 +2815,42 @@ async function saveCashBoxRecord() {
   };
 
   try {
-    await addDoc(cashBoxCollection, record);
-    alert("💾 Cash box record saved and synced!");
-    fetchCashBoxRecords(); // Refresh history after save
+    const docRef = await addDoc(cashBoxCollection, record);
+console.log("✅ Saved Cash Box Record with ID:", docRef.id);
+
+alert("💾 Cash box record saved and synced!");
+await fetchCashBoxRecords();
+
+// Store latest actual amount in local memory for next day
+localStorage.setItem("lastActualAmount", record.actualAmount);
+
+// Reset form for next day
+resetCashBoxForm();
+loadPreviousDayBalance();
+
   } catch (err) {
     console.error("Error saving cash box:", err);
     alert("Error saving cash box record.");
   }
+}
+
+function resetCashBoxForm() {
+  document.getElementById('totalSale').value = '';
+  document.getElementById('onlinePayments').value = '';
+  document.getElementById('cashSale').value = '';
+  document.getElementById('totalExpenses').value = '';
+  document.getElementById('expectedClosing').value = '';
+  document.getElementById('actualAmount').value = '';
+  document.getElementById('matchStatus').innerHTML = '';
+  document.getElementById('expenseList').innerHTML = '';
+  cashExpenses = []; // reset array
+}
+
+function loadPreviousDayBalance() {
+  const lastActual = parseFloat(localStorage.getItem("lastActualAmount")) || 0;
+  const openInput = document.getElementById('openingBalance');
+  openInput.value = lastActual ? lastActual.toFixed(2) : '';
+  openInput.focus();
 }
 
 // ===== make module functions available to inline HTML =====
@@ -2861,19 +2891,36 @@ function renderCashBoxHistory(records) {
     const diff = (r.actualAmount - r.expectedClosing).toFixed(2);
     const color = diff == 0 ? "#d4edda" : diff > 0 ? "#fff3cd" : "#f8d7da";
     const row = `<tr style="background:${color}">
-      <td>${r.date}</td>
-      <td>${r.openingBalance.toFixed(2)}</td>
-      <td>${r.totalSale.toFixed(2)}</td>
-      <td>${r.onlinePayments.toFixed(2)}</td>
-      <td>${r.cashSale.toFixed(2)}</td>
-      <td>${r.totalExpenses.toFixed(2)}</td>
-      <td>${r.expectedClosing.toFixed(2)}</td>
-      <td>${r.actualAmount.toFixed(2)}</td>
-      <td>${diff}</td>
-    </tr>`;
+  <td>${r.date}</td>
+  <td>${r.openingBalance.toFixed(2)}</td>
+  <td>${r.totalSale.toFixed(2)}</td>
+  <td>${r.onlinePayments.toFixed(2)}</td>
+  <td>${r.cashSale.toFixed(2)}</td>
+  <td>${r.totalExpenses.toFixed(2)}</td>
+  <td>${r.expectedClosing.toFixed(2)}</td>
+  <td>${r.actualAmount.toFixed(2)}</td>
+  <td>${diff}</td>
+  <td><button style="background:red;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;"
+    onclick="deleteCashBoxRecord('${r.id}')">🗑 Delete</button></td>
+</tr>`;
+
     tbody.insertAdjacentHTML("beforeend", row);
   });
 }
+
+async function deleteCashBoxRecord(id) {
+  if (!confirm("Are you sure you want to delete this record?")) return;
+  try {
+    const docRef = doc(db, "cashBoxRecords", id);
+    await deleteDoc(docRef);
+    alert("🗑 Record deleted successfully!");
+    fetchCashBoxRecords();
+  } catch (err) {
+    console.error("Error deleting record:", err);
+    alert("Error deleting record.");
+  }
+}
+
 
 // Filter records by date
 function filterCashBoxHistory() {
@@ -2914,6 +2961,7 @@ function exportCashBoxToExcel() {
 // Initialize when tab opens
 function openCashBoxTab() {
   fetchCashBoxRecords();
+  loadPreviousDayBalance(); // ✅ Auto-load previous balance
 }
 
     </script>
