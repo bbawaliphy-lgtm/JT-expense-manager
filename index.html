@@ -1707,12 +1707,14 @@ async function generateNextInvoiceNumber() {
     const itemsSubtotal = orderItems.reduce((sum, item) => sum + item.totalCost, 0);
     const finalTotal = itemsSubtotal - orderDiscount + orderOtherCharges;
 
-    // Distribute totals among items
+    // Distribute discount and charges proportionally based on item cost
     orderItems.forEach(i => {
-        i.discount = orderDiscount / orderItems.length;
-        i.otherCharges = orderOtherCharges / orderItems.length;
+        const itemShare = i.totalCost / itemsSubtotal;
+        i.discount = orderDiscount * itemShare;
+        i.otherCharges = orderOtherCharges * itemShare;
         i.itemsSubtotal = itemsSubtotal;
-        i.finalOrderTotal = finalTotal;
+        i.finalItemTotal = i.totalCost - i.discount + i.otherCharges;
+        i.finalOrderTotal = finalTotal; // Keep for reference but don't use in calculations
     });
 
     // Add all items to purchases
@@ -1823,10 +1825,10 @@ if (tabName === 'cashBox') {
                     <td>${purchase.unit}</td>
                     <td>₹${purchase.unitPrice.toFixed(2)}</td>
                     <td>₹${purchase.totalCost.toFixed(2)}</td>
-                    <td>${purchase.paymentMode}</td>
-<td>₹${(purchase.discount || 0).toFixed(2)}</td>
-<td>₹${(purchase.otherCharges || 0).toFixed(2)}</td>
-<td>₹${(purchase.finalOrderTotal || purchase.totalCost).toFixed(2)}</td>
+                    <td>${purchase.paymentMode || purchase.paymentMode}</td>
+                    <td>₹${(purchase.discount || 0).toFixed(2)}</td>
+                    <td>₹${(purchase.otherCharges || 0).toFixed(2)}</td>
+                    <td>₹${(purchase.finalItemTotal || purchase.totalCost).toFixed(2)}</td>
                     <td class="actions">
                         <button class="btn btn-sm btn-primary" onclick="editRecord(${purchases.indexOf(purchase)})">Edit</button>
                         <button class="btn btn-sm btn-danger" onclick="deleteRecord(${purchases.indexOf(purchase)})">Delete</button>
@@ -2006,7 +2008,7 @@ if (tabName === 'cashBox') {
             
             purchases.forEach(purchase => {
     const purchaseDate = new Date(purchase.date);
-    const amount = purchase.finalOrderTotal || purchase.totalCost;  // ✅ CORRECT - includes discount/charges
+    const amount = purchase.finalItemTotal || purchase.totalCost;  // ✅ Use individual item's final total
     
     overallTotal += amount;
     
