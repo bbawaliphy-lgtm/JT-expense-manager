@@ -1356,7 +1356,8 @@ async function backupSingleRecord(p) {
         let itemCounter = 0;
 let lastBackupTimestamp = null;
 let lastSaveTimestamp = null;
-
+let itemSuggestions = [];     
+let supplierSuggestions = [];
 
 // On load: if cloud has any records, replace local data with cloud (mirror)
 async function syncFromCloudOnLoad() {
@@ -2859,6 +2860,7 @@ window.removeExpenseItem = removeExpenseItem;
 window.calculateCashBox = calculateCashBox;
 window.compareCashBox = compareCashBox;
 window.saveCashBoxRecord = saveCashBoxRecord;
+window.deleteCashBoxRecord = deleteCashBoxRecord;
 window.openCashBoxTab = openCashBoxTab || ( () => fetchCashBoxRecords && fetchCashBoxRecords() );
 window.filterCashBoxHistory = filterCashBoxHistory || (()=>{});
 window.exportCashBoxToExcel = exportCashBoxToExcel || (()=>{});
