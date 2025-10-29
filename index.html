@@ -691,6 +691,173 @@ body {
     z-index: 9999;
 }
 
+/* Floating Calculator Styles */
+.calculator-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 280px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  z-index: 1000;
+  display: none;
+  overflow: hidden;
+}
+
+.calculator-widget.active {
+  display: block;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.calculator-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+  user-select: none;
+}
+
+.calculator-header span {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.calc-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.3s;
+}
+
+.calc-close:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.calculator-body {
+  padding: 15px;
+}
+
+.calc-display {
+  width: 100%;
+  padding: 15px;
+  font-size: 24px;
+  text-align: right;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  background: #f8f9fa;
+  font-family: 'Courier New', monospace;
+  color: #333;
+}
+
+.calc-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.calc-buttons button {
+  padding: 15px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calc-buttons button:hover {
+  background: #e0e0e0;
+  transform: scale(1.05);
+}
+
+.calc-buttons button:active {
+  transform: scale(0.95);
+}
+
+.calc-equal {
+  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  color: white !important;
+  grid-row: span 2;
+}
+
+.calc-zero {
+  grid-column: span 2;
+}
+
+/* Calculator Toggle Button */
+.calc-toggle-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  font-size: 28px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  z-index: 999;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calc-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+.calc-toggle-btn.hidden {
+  display: none;
+}
+
+/* Make calculator draggable on mobile */
+@media (max-width: 768px) {
+  .calculator-widget {
+    width: 90%;
+    left: 5%;
+    right: auto;
+    bottom: 10px;
+  }
+  
+  .calc-toggle-btn {
+    bottom: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+  }
+}
 
     </style>
 </head>
@@ -913,10 +1080,10 @@ body {
                             <th>Unit</th>
                             <th>Unit Price</th>
                             <th>Total Cost</th>
-<th>Discount</th>
-<th>Other Charges</th>
-<th>Final Total</th>
                             <th>Payment</th>
+                            <th>Discount</th>
+                            <th>Other Charges</th>
+                            <th>Final Total</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -1825,7 +1992,7 @@ if (tabName === 'cashBox') {
                     <td>${purchase.unit}</td>
                     <td>₹${purchase.unitPrice.toFixed(2)}</td>
                     <td>₹${purchase.totalCost.toFixed(2)}</td>
-                    <td>${purchase.paymentMode || purchase.paymentMode}</td>
+                    <td>${purchase.paymentMode || 'N/A'}</td>
                     <td>₹${(purchase.discount || 0).toFixed(2)}</td>
                     <td>₹${(purchase.otherCharges || 0).toFixed(2)}</td>
                     <td>₹${(purchase.finalItemTotal || purchase.totalCost).toFixed(2)}</td>
@@ -2552,6 +2719,136 @@ window.exportPayeeSummaryToExcel = exportPayeeSummaryToExcel;
 window.backupSingleRecord = backupSingleRecord;
 window.syncFromCloudOnLoad = syncFromCloudOnLoad;
 
+// ================== FLOATING CALCULATOR ==================
+let calcValue = '0';
+let calcOperator = null;
+let calcPrevValue = null;
+
+function toggleCalculator() {
+  const calc = document.getElementById('calculator-widget');
+  const btn = document.getElementById('calc-toggle-btn');
+  
+  if (calc.classList.contains('active')) {
+    calc.classList.remove('active');
+    btn.classList.remove('hidden');
+  } else {
+    calc.classList.add('active');
+    btn.classList.add('hidden');
+  }
+}
+
+function calcAppend(value) {
+  const display = document.getElementById('calc-display');
+  
+  if (calcValue === '0' || calcValue === 'Error') {
+    calcValue = value;
+  } else {
+    calcValue += value;
+  }
+  
+  display.value = calcValue;
+}
+
+function calcClear() {
+  calcValue = '0';
+  calcOperator = null;
+  calcPrevValue = null;
+  document.getElementById('calc-display').value = '0';
+}
+
+function calcDelete() {
+  if (calcValue.length > 1) {
+    calcValue = calcValue.slice(0, -1);
+  } else {
+    calcValue = '0';
+  }
+  document.getElementById('calc-display').value = calcValue;
+}
+
+function calcEqual() {
+  try {
+    // Evaluate the expression safely
+    const result = Function('"use strict"; return (' + calcValue + ')')();
+    calcValue = result.toString();
+    document.getElementById('calc-display').value = calcValue;
+  } catch (error) {
+    calcValue = 'Error';
+    document.getElementById('calc-display').value = 'Error';
+  }
+}
+
+// Make calculator draggable
+let isDragging = false;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+let xOffset = 0;
+let yOffset = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+  const calculator = document.getElementById('calculator-widget');
+  const header = calculator?.querySelector('.calculator-header');
+  
+  if (header) {
+    header.addEventListener('mousedown', dragStart);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
+    
+    // Touch events for mobile
+    header.addEventListener('touchstart', dragStart);
+    document.addEventListener('touchmove', drag);
+    document.addEventListener('touchend', dragEnd);
+  }
+});
+
+function dragStart(e) {
+  const calculator = document.getElementById('calculator-widget');
+  if (e.type === 'touchstart') {
+    initialX = e.touches[0].clientX - xOffset;
+    initialY = e.touches[0].clientY - yOffset;
+  } else {
+    initialX = e.clientX - xOffset;
+    initialY = e.clientY - yOffset;
+  }
+
+  if (e.target.closest('.calculator-header')) {
+    isDragging = true;
+  }
+}
+
+function drag(e) {
+  if (isDragging) {
+    e.preventDefault();
+    const calculator = document.getElementById('calculator-widget');
+    
+    if (e.type === 'touchmove') {
+      currentX = e.touches[0].clientX - initialX;
+      currentY = e.touches[0].clientY - initialY;
+    } else {
+      currentX = e.clientX - initialX;
+      currentY = e.clientY - initialY;
+    }
+
+    xOffset = currentX;
+    yOffset = currentY;
+
+    calculator.style.transform = `translate(${currentX}px, ${currentY}px)`;
+  }
+}
+
+function dragEnd(e) {
+  initialX = currentX;
+  initialY = currentY;
+  isDragging = false;
+}
+
+// Expose calculator functions to window
+window.toggleCalculator = toggleCalculator;
+window.calcAppend = calcAppend;
+window.calcClear = calcClear;
+window.calcDelete = calcDelete;
+window.calcEqual = calcEqual;
 
     // PWA: Register service worker
 if ("serviceWorker" in navigator) {
@@ -2687,7 +2984,7 @@ function renderPayeeSummary() {
     const key = `${p.payee}-${p.paymentMode}`;
     if (!summary[key]) summary[key] = { payee: p.payee, paymentMode: p.paymentMode, orders: 0, total: 0 };
     summary[key].orders += 1;
-    summary[key].total += parseFloat(p.finalOrderTotal || p.totalCost || 0);
+    summary[key].total += parseFloat(p.finalItemTotal || p.totalCost || 0);
   });
 
   tbody.innerHTML = "";
@@ -3028,6 +3325,45 @@ function openCashBoxTab() {
 
     </script>
 
+<!-- Floating Calculator -->
+<div id="calculator-widget" class="calculator-widget">
+  <div class="calculator-header">
+    <span>Calculator</span>
+    <button onclick="toggleCalculator()" class="calc-close">&times;</button>
+  </div>
+  <div class="calculator-body">
+    <input type="text" id="calc-display" class="calc-display" readonly value="0">
+    <div class="calc-buttons">
+      <button onclick="calcClear()">C</button>
+      <button onclick="calcDelete()">⌫</button>
+      <button onclick="calcAppend('/')">/</button>
+      <button onclick="calcAppend('*')">*</button>
+      
+      <button onclick="calcAppend('7')">7</button>
+      <button onclick="calcAppend('8')">8</button>
+      <button onclick="calcAppend('9')">9</button>
+      <button onclick="calcAppend('-')">-</button>
+      
+      <button onclick="calcAppend('4')">4</button>
+      <button onclick="calcAppend('5')">5</button>
+      <button onclick="calcAppend('6')">6</button>
+      <button onclick="calcAppend('+')">+</button>
+      
+      <button onclick="calcAppend('1')">1</button>
+      <button onclick="calcAppend('2')">2</button>
+      <button onclick="calcAppend('3')">3</button>
+      <button onclick="calcEqual()" class="calc-equal">=</button>
+      
+      <button onclick="calcAppend('0')" class="calc-zero">0</button>
+      <button onclick="calcAppend('.')">.</button>
+    </div>
+  </div>
+</div>
+
+<!-- Calculator Toggle Button -->
+<button id="calc-toggle-btn" onclick="toggleCalculator()" class="calc-toggle-btn">
+  🧮
+</button>
   </div>
 <datalist id="item-suggestions"></datalist>
 <datalist id="supplier-suggestions"></datalist>
