@@ -1042,9 +1042,12 @@ body {
 <div id="cashBox-tab" class="tab-content" style="display:none; padding:20px;">
   <h2>💰 Cash Box Calculator</h2>
   <div class="form-group">
-    <label>Date</label>
-    <input type="date" id="cashDate">
+  <label>Date</label>
+  <div style="display:flex; gap:10px; align-items:center;">
+    <input type="date" id="cashDate" style="flex:1;">
+    <button class="btn btn-primary" onclick="loadShopCashExpenses()" style="padding:8px 16px;">📥 Load Shop Expenses</button>
   </div>
+</div>
 
   <div class="form-group">
     <label>Opening Balance</label>
@@ -1539,6 +1542,18 @@ async function syncFromCloudOnLoad() {
             });
             
             updateOrderSummary();
+
+// ✅ ADD THESE LINES HERE (only once, when first item is added)
+if (itemCounter === 1) {
+    if (!document.getElementById('order-discount').hasAttribute('data-listener-added')) {
+        document.getElementById('order-discount').addEventListener('input', updateOrderSummary);
+        document.getElementById('order-discount').setAttribute('data-listener-added', 'true');
+    }
+    if (!document.getElementById('order-other-charges').hasAttribute('data-listener-added')) {
+        document.getElementById('order-other-charges').addEventListener('input', updateOrderSummary);
+        document.getElementById('order-other-charges').setAttribute('data-listener-added', 'true');
+    }
+}
         }
 
         function removeItemRow(itemId) {
@@ -1558,15 +1573,7 @@ async function syncFromCloudOnLoad() {
                     btn.style.display = 'inline-block';
                 });
             }
-// Add event listeners for discount and other charges (only add once)
-if (!document.getElementById('order-discount').hasAttribute('data-listener-added')) {
-    document.getElementById('order-discount').addEventListener('input', updateOrderSummary);
-    document.getElementById('order-discount').setAttribute('data-listener-added', 'true');
-}
-if (!document.getElementById('order-other-charges').hasAttribute('data-listener-added')) {
-    document.getElementById('order-other-charges').addEventListener('input', updateOrderSummary);
-    document.getElementById('order-other-charges').setAttribute('data-listener-added', 'true');
-}
+
         }
 
         function calculateItemTotal(itemId) {
@@ -1998,25 +2005,25 @@ if (tabName === 'cashBox') {
             const categoryTotals = {};
             
             purchases.forEach(purchase => {
-                const purchaseDate = new Date(purchase.date);
-                const amount = purchase.totalCost;
-                
-                overallTotal += amount;
-                
-                if (purchase.date === today) {
-                    todayTotal += amount;
-                }
-                
-                if (purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear) {
-                    monthTotal += amount;
-                }
-                
-                if (!categoryTotals[purchase.category]) {
-                    categoryTotals[purchase.category] = { amount: 0, count: 0 };
-                }
-                categoryTotals[purchase.category].amount += amount;
-                categoryTotals[purchase.category].count += 1;
-            });
+    const purchaseDate = new Date(purchase.date);
+    const amount = purchase.finalOrderTotal || purchase.totalCost;  // ✅ CORRECT - includes discount/charges
+    
+    overallTotal += amount;
+    
+    if (purchase.date === today) {
+        todayTotal += amount;
+    }
+    
+    if (purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear) {
+        monthTotal += amount;
+    }
+    
+    if (!categoryTotals[purchase.category]) {
+        categoryTotals[purchase.category] = { amount: 0, count: 0 };
+    }
+    categoryTotals[purchase.category].amount += amount;
+    categoryTotals[purchase.category].count += 1;
+});
             
             document.getElementById('today-total').textContent = `₹${todayTotal.toFixed(2)}`;
             document.getElementById('month-total').textContent = `₹${monthTotal.toFixed(2)}`;
@@ -2735,6 +2742,54 @@ let cashBoxRecords = [];
 // Firebase reference
 const cashBoxCollection = collection(db, "cashBoxRecords");
 
+// ✅ ADD THIS NEW FUNCTION
+async function loadShopCashExpenses() {
+  const dateInput = document.getElementById('cashDate');
+  const selectedDate = dateInput.value;
+  
+  if (!selectedDate) {
+    alert("Please select a date first");
+    return;
+  }
+
+  // Filter purchases: Shop + Cash + matching date
+  const shopCashExpenses = purchases.filter(p => 
+    p.payee === "Shop" && 
+    p.paymentMode === "Cash" && 
+    p.date === selectedDate
+  );
+
+  if (shopCashExpenses.length === 0) {
+    alert("No Shop cash expenses found for this date");
+    return;
+  }
+
+  // Clear existing expenses
+  document.getElementById('expenseList').innerHTML = '';
+  cashExpenses = [];
+
+  // Add each shop expense as an expense item
+  shopCashExpenses.forEach(expense => {
+    const container = document.getElementById('expenseList');
+    const index = cashExpenses.length;
+    const row = document.createElement('div');
+    row.className = 'expense-item';
+    row.innerHTML = `
+      <input type="text" id="expDesc${index}" value="Shop Purchase - ${expense.item}" readonly>
+      <input type="number" id="expAmt${index}" step="0.01" value="${(expense.finalOrderTotal || expense.totalCost).toFixed(2)}" oninput="calculateCashBox()">
+      <button class="btn btn-danger btn-small" onclick="removeExpenseItem(${index})">Remove</button>
+    `;
+    container.appendChild(row);
+    cashExpenses.push({ 
+      description: `Shop Purchase - ${expense.item}`, 
+      amount: expense.finalOrderTotal || expense.totalCost 
+    });
+  });
+
+  calculateCashBox();
+  alert(`✅ Loaded ${shopCashExpenses.length} Shop cash expenses for ${selectedDate}`);
+}
+
 // Add new expense input row
 function addExpenseItem() {
   const container = document.getElementById('expenseList');
@@ -2861,6 +2916,7 @@ window.calculateCashBox = calculateCashBox;
 window.compareCashBox = compareCashBox;
 window.saveCashBoxRecord = saveCashBoxRecord;
 window.deleteCashBoxRecord = deleteCashBoxRecord;
+window.loadShopCashExpenses = loadShopCashExpenses;
 window.openCashBoxTab = openCashBoxTab || ( () => fetchCashBoxRecords && fetchCashBoxRecords() );
 window.filterCashBoxHistory = filterCashBoxHistory || (()=>{});
 window.exportCashBoxToExcel = exportCashBoxToExcel || (()=>{});
@@ -2903,7 +2959,7 @@ function renderCashBoxHistory(records) {
   <td>${r.actualAmount.toFixed(2)}</td>
   <td>${diff}</td>
   <td><button style="background:red;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;"
-    onclick="deleteCashBoxRecord('${doc.id}')">🗑 Delete</button></td>
+    onclick="deleteCashBoxRecord('${r.id}')">🗑 Delete</button></td>
 </tr>`;
 
     tbody.insertAdjacentHTML("beforeend", row);
