@@ -2901,7 +2901,7 @@ function renderCashBoxHistory(records) {
   <td>${r.actualAmount.toFixed(2)}</td>
   <td>${diff}</td>
   <td><button style="background:red;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;"
-    onclick="deleteCashBoxRecord('${r.id}')">🗑 Delete</button></td>
+    onclick="deleteCashBoxRecord('${doc.id}')">🗑 Delete</button></td>
 </tr>`;
 
     tbody.insertAdjacentHTML("beforeend", row);
@@ -2909,17 +2909,19 @@ function renderCashBoxHistory(records) {
 }
 
 async function deleteCashBoxRecord(id) {
-  if (!confirm("Are you sure you want to delete this record?")) return;
   try {
-    const docRef = doc(db, "cashBoxRecords", id);
-    await deleteDoc(docRef);
-    alert("🗑 Record deleted successfully!");
-    fetchCashBoxRecords();
-  } catch (err) {
-    console.error("Error deleting record:", err);
-    alert("Error deleting record.");
+    const confirmDelete = confirm("Are you sure you want to delete this record?");
+    if (!confirmDelete) return;
+
+    await deleteDoc(doc(db, "cashBoxRecords", id));
+    alert("Cash box record deleted successfully!");
+    fetchCashBoxRecords(); // Refresh history list
+  } catch (error) {
+    console.error("Error deleting cash box record:", error);
+    alert("Failed to delete record. Check console for details.");
   }
 }
+
 
 
 // Filter records by date
