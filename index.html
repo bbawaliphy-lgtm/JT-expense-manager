@@ -1029,8 +1029,10 @@ body {
 </head>
 <body>
   <!-- 🔐 LOGIN SCREEN (shown first) -->
-<div id="login-screen" style="display:flex;">
+<!-- Login screen should be visible first -->
+<div id="login-screen" style="display:block;">
   <div class="login-card">
+          <!-- 🔥 Logo above login title -->
     <img src="logo.png" alt="Outlet Logo" style="width:80px; margin-bottom:15px;">
     <h2>🔐 JT's Expense Manager</h2>
     <input type="email" id="login-email" placeholder="Enter Email">
@@ -1467,7 +1469,6 @@ body {
     <button class="btn btn-primary" onclick="showStaffSection('leave')">Leave Management</button>
     <button class="btn btn-primary" onclick="showStaffSection('reports')">Reports</button>
     <button class="btn btn-primary" onclick="showStaffSection('list')">Staff List</button>
-<button class="btn btn-warning" onclick="manuallyProcessAutoLeaves()">🔄 Process Auto Leaves</button>
   </div>
 
   <!-- Register Staff Section -->
@@ -1758,9 +1759,7 @@ body {
     </div>
 
        <script type="module">
-        
-
-// ===== FIREBASE IMPORTS & INIT =====
+        // ===== FIREBASE IMPORTS & INIT =====
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import {
   getFirestore,
@@ -1780,7 +1779,9 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
-// Your Firebase config
+           
+
+// Your Firebase config (you gave this earlier)
 const firebaseConfig = {
   apiKey: "AIzaSyB_C__OZ6dWi1cZOBGOrJxNg_710lPwaxY",
   authDomain: "jt-expense-manager.firebaseapp.com",
@@ -1793,75 +1794,16 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
-// Try enabling offline persistence
+// Try enabling offline persistence (optional, non-blocking)
 enableIndexedDbPersistence(db).catch(err => console.warn("IndexedDB persistence not enabled:", err && err.code));
 
-// Firestore collection references
+const auth = getAuth(app);
+
+// Firestore collection reference
 const purchasesCollection = collection(db, "purchases");
 const itemSuggestionsCollection = collection(db, "itemSuggestions");
 const supplierSuggestionsCollection = collection(db, "supplierSuggestions");
-
-// ===== AUTHENTICATION HANDLING =====
-
-// Login function
-async function login() {
-  const email = document.getElementById("login-email").value;
-  const password = document.getElementById("login-password").value;
-  
-  if (!email || !password) {
-    document.getElementById("login-error").innerText = "Please enter both email and password";
-    return;
-  }
-  
-  try {
-    console.log("Attempting login with:", email);
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    console.log("Login successful:", userCredential.user);
-    document.getElementById("login-error").innerText = "";
-  } catch (e) {
-    console.error("Login error:", e);
-    document.getElementById("login-error").innerText = e.message;
-  }
-}
-
-// Logout function
-async function logout() {
-  try {
-    await signOut(auth);
-    console.log("Logout successful");
-  } catch (e) {
-    console.error("Logout error:", e);
-  }
-}
-
-// Listen to login state changes
-onAuthStateChanged(auth, (user) => {
-  console.log("Auth state changed, user:", user);
-  if (user) {
-    // ✅ Logged in: hide login, show app
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("app-screen").style.display = "block";
-    
-    // ✅ NOW SET UP FIRESTORE LISTENERS (only when logged in)
-    setupFirestoreListeners();
-    loadData();
-    setTodayDate();
-    generateNextInvoiceNumber();
-    displayRecords();
-    updateSummary();
-    
-  } else {
-    // ❌ Not logged in: show login screen
-    document.getElementById("login-screen").style.display = "flex"; 
-    document.getElementById("app-screen").style.display = "none";
-  }
-});
-
-// Make login/logout available for onclick in HTML
-window.login = login;
-window.logout = logout;
 
 // ===== SETUP FIRESTORE LISTENERS (ONLY AFTER LOGIN) =====
 let listenersInitialized = false;
@@ -1871,9 +1813,7 @@ function setupFirestoreListeners() {
   if (listenersInitialized) return;
   listenersInitialized = true;
 
-  console.log("Setting up Firestore listeners...");
-
-  // Real-time sync listener
+  // ===== REAL-TIME SYNC LISTENER =====
   onSnapshot(purchasesCollection, snapshot => {
     let cloudData = [];
     snapshot.forEach(docSnap => cloudData.push(docSnap.data()));
@@ -1887,7 +1827,7 @@ function setupFirestoreListeners() {
     console.log("🔄 Local data updated in real-time from Firestore.");
   });
 
-  // Real-time sync for item suggestions
+  // ===== REAL-TIME SYNC FOR ITEM SUGGESTIONS =====
   onSnapshot(itemSuggestionsCollection, snapshot => {
     itemSuggestions = [];
     snapshot.forEach(docSnap => {
@@ -1897,7 +1837,7 @@ function setupFirestoreListeners() {
     console.log("🔄 Item suggestions updated from Firestore:", itemSuggestions.length);
   });
 
-  // Real-time sync for supplier suggestions
+  // ===== REAL-TIME SYNC FOR SUPPLIER SUGGESTIONS =====
   onSnapshot(supplierSuggestionsCollection, snapshot => {
     supplierSuggestions = [];
     snapshot.forEach(docSnap => {
@@ -1906,15 +1846,68 @@ function setupFirestoreListeners() {
     renderSupplierSuggestions();
     console.log("🔄 Supplier suggestions updated from Firestore:", supplierSuggestions.length);
   });
-
-  // Setup staff real-time listeners
+// Setup staff real-time listeners
   setupStaffListeners();
 }
 
-// --- Rest of your existing code continues here ---
-let purchases = [];
-let editingIndex = -1;
-let itemCounter = 0;
+
+           // ===== AUTHENTICATION HANDLING =====
+
+// Login function
+async function login() {
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    document.getElementById("login-error").innerText = "";
+  } catch (e) {
+    document.getElementById("login-error").innerText = e.message;
+  }
+}
+
+// Logout function
+async function logout() {
+  await signOut(auth);
+}
+
+// Listen to login state changes
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // ✅ Logged in: hide login, show app
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app-screen").style.display = "block";
+    
+    // ✅ NOW SET UP FIRESTORE LISTENERS (only when logged in)
+    setupFirestoreListeners();
+  } else {
+    // ❌ Not logged in: keep login screen centered
+    document.getElementById("login-screen").style.display = "flex"; 
+    document.getElementById("app-screen").style.display = "none";
+  }
+});
+
+
+// Make login/logout available for onclick in HTML
+window.login = login;
+window.logout = logout;
+
+
+
+           // Save or update a single record to Firestore (non-blocking)
+async function backupSingleRecord(p) {
+    try {
+        const id = `${p.invoice || "INV"}_${(p.item || "Item").toString().replace(/\s+/g, "_")}_${p.date || Date.now()}`.replace(/[^\w\-_.]/g,'_');
+        await setDoc(doc(purchasesCollection, id), p);
+        console.log("Auto-backed up to cloud:", id);
+    } catch (error) {
+        console.warn("Auto-backup failed for:", p, error);
+    }
+}
+
+        // --- Your original code starts here ---
+        let purchases = [];
+        let editingIndex = -1;
+        let itemCounter = 0;
 let lastBackupTimestamp = null;
 let lastSaveTimestamp = null;
 let itemSuggestions = [];     
@@ -1940,12 +1933,11 @@ async function syncFromCloudOnLoad() {
     }
 }
 
-// Initialize app - MODIFIED to work with auth
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log("DOM loaded, waiting for authentication...");
-    // Don't load data here - wait for auth state change
-    // The auth state change listener will handle data loading
-});
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', async function() {
+    loadData();
+    // Replace local with cloud data if cloud has any records
+    await syncFromCloudOnLoad();
 
     setTodayDate();
     await generateNextInvoiceNumber();
@@ -4036,13 +4028,19 @@ function calculateAttendance(staffId, shiftStart, shiftEnd, workingHours) {
   `;
 }
 
-// Save attendance to Firestore WITH AUTO LEAVE CALCULATION
+// Save attendance to Firestore
 async function saveAttendance(staffId, date, shiftStart, shiftEnd, workingHours) {
   const entryTime = document.getElementById(`entry-${staffId}`).value;
   const exitTime = document.getElementById(`exit-${staffId}`).value;
 
   if (!entryTime || !exitTime) {
     alert('Please enter both entry and exit time');
+    return;
+  }
+
+  const staff = staffMembers.find(s => s.id === staffId);
+  if (!staff) {
+    alert('Staff not found');
     return;
   }
 
@@ -4062,16 +4060,42 @@ async function saveAttendance(staffId, date, shiftStart, shiftEnd, workingHours)
   
   const overtimeMinutes = Math.max(0, minutesWorked - (workingHours * 60));
 
+  // Check if worked less than half day
+  const halfDayHours = workingHours / 2;
+  let leaveDeducted = 0;
+
+  if (parseFloat(hoursWorked) <= halfDayHours) {
+    // Check leave balance
+    const usedLeaves = leaveRecords
+      .filter(l => l.staffId === staffId && l.date >= getFirstDayOfMonth())
+      .reduce((sum, l) => sum + l.leaveDays, 0);
+
+    const availableBalance = staff.leavesPerMonth - usedLeaves;
+
+    if (availableBalance < 0.5) {
+      if (!confirm(`⚠️ Staff worked ${hoursWorked} hours (half day). Insufficient leave balance (${availableBalance} days left). Save anyway?`)) {
+        return;
+      }
+    } else {
+      if (!confirm(`Staff worked ${hoursWorked} hours (less than half day: ${halfDayHours} hrs). Deduct 0.5 day leave?`)) {
+        leaveDeducted = 0;
+      } else {
+        leaveDeducted = 0.5;
+      }
+    }
+  }
+
   const attendanceData = {
     staffId,
     date,
     entryTime,
     exitTime,
-    hoursWorked: parseFloat(hoursWorked),
+    hoursWorked,
     status,
     isLate,
     lateByMinutes,
     overtimeHours: (overtimeMinutes / 60).toFixed(2),
+    leaveDeducted,
     timestamp: new Date().toISOString()
   };
 
@@ -4093,10 +4117,29 @@ async function saveAttendance(staffId, date, shiftStart, shiftEnd, workingHours)
       await addDoc(attendanceCollection, attendanceData);
     }
 
-    // ✅ NEW: Calculate and deduct leaves automatically
-    await calculateAndDeductLeavesForStaff(staffId, date, parseFloat(hoursWorked), workingHours);
+    // Auto-create leave record if half-day leave deducted
+    if (leaveDeducted > 0) {
+      const leaveData = {
+        staffId,
+        staffName: staff.name,
+        leaveType: 'half',
+        fromDate: date,
+        toDate: date,
+        leaveDays: leaveDeducted,
+        reason: `Auto-deducted: Worked only ${hoursWorked} hours (half day)`,
+        appliedOn: new Date().toISOString(),
+        date: date,
+        autoDeducted: true
+      };
 
-    alert('✅ Attendance saved successfully! Auto leave calculated if applicable.');
+      await addDoc(leaveCollection, leaveData);
+      leaveRecords.push(leaveData);
+
+      alert(`✅ Attendance saved! ${leaveDeducted} day leave deducted from balance.`);
+    } else {
+      alert('✅ Attendance saved successfully!');
+    }
+
     loadAttendanceForDate();
   } catch (error) {
     console.error('Error saving attendance:', error);
@@ -4104,133 +4147,35 @@ async function saveAttendance(staffId, date, shiftStart, shiftEnd, workingHours)
   }
 }
 
-// ================== DAILY AUTO LEAVE PROCESS ==================
-
-// Run this function daily to process leaves automatically
-async function processDailyAutoLeaves() {
-  const today = new Date().toISOString().split('T')[0];
-  
-  try {
-    // Fetch all staff members
-    const staffSnapshot = await getDocs(staffCollection);
-    const allStaff = staffSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    // Fetch today's attendance
-    const attendanceSnapshot = await getDocs(attendanceCollection);
-    const todayAttendance = attendanceSnapshot.docs
-      .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(att => att.date === today);
-
-    for (const staff of allStaff) {
-      // Find today's attendance for this staff
-      const attendance = todayAttendance.find(att => att.staffId === staff.id);
-      
-      if (!attendance) {
-        // No attendance marked - treat as absent (full day leave)
-        await createAutoLeaveRecord(staff.id, today, 'Auto: No Attendance Marked', 1);
-      } else {
-        // Calculate based on hours worked
-        await calculateAndDeductLeavesForStaff(
-          staff.id, 
-          today, 
-          parseFloat(attendance.hoursWorked || 0), 
-          staff.workingHours
-        );
-      }
-    }
-    
-    console.log('✅ Daily auto leave processing completed');
-    alert('✅ Auto leaves processed for all staff!');
-  } catch (error) {
-    console.error('Error in daily auto leave processing:', error);
-    alert('❌ Error processing auto leaves');
-  }
-}
-
-// ================== MANUAL TRIGGER FOR TESTING ==================
-
-function manuallyProcessAutoLeaves() {
-  if (confirm('Process auto leaves for today? This will deduct leaves based on attendance patterns.')) {
-    processDailyAutoLeaves();
-  }
-}
-
-// Calculate leaves for specific staff
-async function calculateAndDeductLeavesForStaff(staffId, date, hoursWorked, scheduledHours) {
-  const staff = staffMembers.find(s => s.id === staffId);
-  if (!staff) return;
-
-  let leaveType = '';
-  let leaveDays = 0;
-
-  // Rule 1: If hours worked is 0 (completely absent) - Full day leave
-  if (hoursWorked === 0) {
-    leaveType = 'Auto: Full Day Absent';
-    leaveDays = 1;
-  }
-  // Rule 2: If worked less than or equal to half of scheduled hours - Half day leave
-  else if (hoursWorked <= (scheduledHours / 2)) {
-    leaveType = 'Auto: Half Day Worked';
-    leaveDays = 0.5;
-  }
-
-  // Deduct leave if applicable
-  if (leaveDays > 0) {
-    await createAutoLeaveRecord(staffId, date, leaveType, leaveDays);
-  }
-}
-
-// Create automatic leave record
-async function createAutoLeaveRecord(staffId, date, leaveType, leaveDays) {
-  try {
-    // Check if auto leave already exists for this date
-    const snapshot = await getDocs(leaveCollection);
-    const existingLeave = snapshot.docs.find(doc => {
-      const data = doc.data();
-      return data.staffId === staffId && data.date === date && data.autoGenerated === true;
-    });
-
-    if (existingLeave) {
-      console.log('Auto leave already exists for this date');
-      return;
-    }
-
-    const staff = staffMembers.find(s => s.id === staffId);
-    if (!staff) return;
-
-    const leaveData = {
-      staffId,
-      staffName: staff.name,
-      leaveType: 'auto',
-      fromDate: date,
-      toDate: date,
-      leaveDays,
-      reason: leaveType,
-      appliedOn: new Date().toISOString(),
-      date: date,
-      autoGenerated: true // Mark as auto-generated
-    };
-
-    await addDoc(leaveCollection, leaveData);
-    console.log(`Auto leave recorded: ${staff.name} - ${leaveDays} day(s)`);
-    
-    // Update UI
-    renderLeaveHistory();
-    updateLeaveBalance();
-  } catch (error) {
-    console.error('Error creating auto leave record:', error);
-  }
-}
-
 // Mark staff as absent
 async function markAbsent(staffId, date) {
-  if (!confirm('Mark this staff as absent? This will be counted as leave.')) return;
+  if (!confirm('Mark this staff as absent? This will be counted as 1 full day leave and deducted from balance.')) return;
+
+  const staff = staffMembers.find(s => s.id === staffId);
+  if (!staff) {
+    alert('Staff not found');
+    return;
+  }
+
+  // Check if leave balance is available
+  const usedLeaves = leaveRecords
+    .filter(l => l.staffId === staffId && l.date >= getFirstDayOfMonth())
+    .reduce((sum, l) => sum + l.leaveDays, 0);
+
+  const availableBalance = staff.leavesPerMonth - usedLeaves;
+
+  if (availableBalance < 1) {
+    if (!confirm(`⚠️ Staff has insufficient leave balance (${availableBalance} days left). Mark as absent anyway?`)) {
+      return;
+    }
+  }
 
   const attendanceData = {
     staffId,
     date,
     status: 'absent',
     hoursWorked: 0,
+    leaveDeducted: 1,
     timestamp: new Date().toISOString()
   };
 
@@ -4251,7 +4196,24 @@ async function markAbsent(staffId, date) {
       await addDoc(attendanceCollection, attendanceData);
     }
 
-    alert('✅ Marked as absent');
+    // Auto-create leave record
+    const leaveData = {
+      staffId,
+      staffName: staff.name,
+      leaveType: 'full',
+      fromDate: date,
+      toDate: date,
+      leaveDays: 1,
+      reason: 'Auto-deducted: Marked absent',
+      appliedOn: new Date().toISOString(),
+      date: date,
+      autoDeducted: true
+    };
+
+    await addDoc(leaveCollection, leaveData);
+    leaveRecords.push(leaveData);
+
+    alert('✅ Marked as absent. 1 day leave deducted from balance.');
     loadAttendanceForDate();
   } catch (error) {
     console.error('Error marking absent:', error);
@@ -4272,296 +4234,6 @@ function formatTime12Hour(timeStr) {
   const period = hours >= 12 ? 'PM' : 'AM';
   const hour12 = hours % 12 || 12;
   return `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`;
-}
-
-
-// ================== ENHANCED LEAVE BALANCE CALCULATION ==================
-
-function calculateLeaveBalance(staffId) {
-  const staff = staffMembers.find(s => s.id === staffId);
-  if (!staff) return 0;
-
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
-
-  // Calculate used leaves (both manual and auto) for current month
-  const usedLeaves = leaveRecords
-    .filter(l => l.staffId === staffId && 
-                new Date(l.date).getMonth() === currentMonth &&
-                new Date(l.date).getFullYear() === currentYear)
-    .reduce((sum, l) => sum + l.leaveDays, 0);
-
-  const balance = staff.leavesPerMonth - usedLeaves;
-  return Math.max(0, balance); // Ensure balance doesn't go negative
-}
-
-// ================== MANUAL TRIGGER FOR TESTING ==================
-
-function manuallyProcessAutoLeaves() {
-  if (confirm('Process auto leaves for today? This will deduct leaves based on attendance.')) {
-    processDailyAutoLeaves();
-    alert('Auto leaves processed! Check leave history.');
-  }
-}
-// ================== AUTOMATIC LEAVE DEDUCTION ==================
-
-async function calculateAndDeductLeaves() {
-  const today = new Date().toISOString().split('T')[0];
-  
-  try {
-    // Fetch today's attendance
-    const attendanceSnapshot = await getDocs(attendanceCollection);
-    const todayAttendance = attendanceSnapshot.docs
-      .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(att => att.date === today);
-
-    for (const att of todayAttendance) {
-      const staff = staffMembers.find(s => s.id === att.staffId);
-      if (!staff) continue;
-
-      let leaveType = '';
-      let leaveDays = 0;
-
-      // Case 1: Staff is absent - Full day leave
-      if (att.status === 'absent') {
-        leaveType = 'Auto: Absent';
-        leaveDays = 1;
-      }
-      // Case 2: Staff worked half day or less - Half day leave
-      else if (att.hoursWorked && att.hoursWorked <= (staff.workingHours / 2)) {
-        leaveType = 'Auto: Half Day Worked';
-        leaveDays = 0.5;
-      }
-
-      // If leave needs to be deducted
-      if (leaveDays > 0) {
-        await createAutoLeaveRecord(staff.id, today, leaveType, leaveDays);
-        console.log(`✅ Auto leave deducted: ${staff.name} - ${leaveType}`);
-      }
-    }
-  } catch (error) {
-    console.error('Error calculating auto leaves:', error);
-  }
-}
-
-// Create automatic leave record
-async function createAutoLeaveRecord(staffId, date, leaveType, leaveDays) {
-  try {
-    // Check if auto leave already exists for this date
-    const snapshot = await getDocs(leaveCollection);
-    const existingLeave = snapshot.docs.find(doc => {
-      const data = doc.data();
-      return data.staffId === staffId && data.date === date && data.autoGenerated === true;
-    });
-
-    if (existingLeave) {
-      console.log('Auto leave already exists for this date');
-      return;
-    }
-
-    const staff = staffMembers.find(s => s.id === staffId);
-    if (!staff) return;
-
-    const leaveData = {
-      staffId,
-      staffName: staff.name,
-      leaveType: 'auto',
-      fromDate: date,
-      toDate: date,
-      leaveDays,
-      reason: leaveType,
-      appliedOn: new Date().toISOString(),
-      date: date,
-      autoGenerated: true // Mark as auto-generated
-    };
-
-    await addDoc(leaveCollection, leaveData);
-    console.log(`Auto leave recorded: ${staff.name} - ${leaveDays} day(s)`);
-    
-    // Update UI
-    renderLeaveHistory();
-    updateLeaveBalance();
-  } catch (error) {
-    console.error('Error creating auto leave record:', error);
-  }
-}
-
-// ================== ENHANCED ATTENDANCE SAVING ==================
-
-// Modify the existing saveAttendance function to include auto leave calculation
-async function saveAttendanceWithAutoLeave(staffId, date, shiftStart, shiftEnd, workingHours) {
-  const entryTime = document.getElementById(`entry-${staffId}`).value;
-  const exitTime = document.getElementById(`exit-${staffId}`).value;
-
-  if (!entryTime || !exitTime) {
-    alert('Please enter both entry and exit time');
-    return;
-  }
-
-  // Calculate all details (existing logic)
-  const entryMinutes = timeToMinutes(entryTime);
-  const exitMinutes = timeToMinutes(exitTime);
-  const shiftStartMinutes = timeToMinutes(shiftStart);
-  
-  const minutesWorked = exitMinutes - entryMinutes;
-  const hoursWorked = (minutesWorked / 60).toFixed(2);
-  
-  const graceMinutes = 5;
-  const isLate = entryMinutes > (shiftStartMinutes + graceMinutes);
-  
-  const status = isLate ? 'late' : 'present';
-  const lateByMinutes = isLate ? (entryMinutes - shiftStartMinutes) : 0;
-  
-  const overtimeMinutes = Math.max(0, minutesWorked - (workingHours * 60));
-
-  const attendanceData = {
-    staffId,
-    date,
-    entryTime,
-    exitTime,
-    hoursWorked: parseFloat(hoursWorked),
-    status,
-    isLate,
-    lateByMinutes,
-    overtimeHours: (overtimeMinutes / 60).toFixed(2),
-    timestamp: new Date().toISOString()
-  };
-
-  try {
-    // Check if attendance already exists
-    const snapshot = await getDocs(attendanceCollection);
-    let existingDocId = null;
-    
-    snapshot.docs.forEach(doc => {
-      const data = doc.data();
-      if (data.staffId === staffId && data.date === date) {
-        existingDocId = doc.id;
-      }
-    });
-
-    if (existingDocId) {
-      await setDoc(doc(attendanceCollection, existingDocId), attendanceData);
-    } else {
-      await addDoc(attendanceCollection, attendanceData);
-    }
-
-    // ✅ NEW: Calculate and deduct leaves automatically
-    await calculateAndDeductLeavesForStaff(staffId, date, parseFloat(hoursWorked), workingHours);
-
-    alert('✅ Attendance saved successfully! Auto leave calculated if applicable.');
-    loadAttendanceForDate();
-  } catch (error) {
-    console.error('Error saving attendance:', error);
-    alert('❌ Failed to save attendance');
-  }
-}
-
-// Calculate leaves for specific staff
-async function calculateAndDeductLeavesForStaff(staffId, date, hoursWorked, scheduledHours) {
-  const staff = staffMembers.find(s => s.id === staffId);
-  if (!staff) return;
-
-  let leaveType = '';
-  let leaveDays = 0;
-
-  // Rule 1: If hours worked is 0 (completely absent) - Full day leave
-  if (hoursWorked === 0) {
-    leaveType = 'Auto: Full Day Absent';
-    leaveDays = 1;
-  }
-  // Rule 2: If worked less than or equal to half of scheduled hours - Half day leave
-  else if (hoursWorked <= (scheduledHours / 2)) {
-    leaveType = 'Auto: Half Day Worked';
-    leaveDays = 0.5;
-  }
-
-  // Deduct leave if applicable
-  if (leaveDays > 0) {
-    await createAutoLeaveRecord(staffId, date, leaveType, leaveDays);
-  }
-}
-
-// ================== ENHANCED LEAVE BALANCE CALCULATION ==================
-
-function calculateLeaveBalance(staffId) {
-  const staff = staffMembers.find(s => s.id === staffId);
-  if (!staff) return 0;
-
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
-
-  // Calculate used leaves (both manual and auto) for current month
-  const usedLeaves = leaveRecords
-    .filter(l => l.staffId === staffId && 
-                new Date(l.date).getMonth() === currentMonth &&
-                new Date(l.date).getFullYear() === currentYear)
-    .reduce((sum, l) => sum + l.leaveDays, 0);
-
-  const balance = staff.leavesPerMonth - usedLeaves;
-  return Math.max(0, balance); // Ensure balance doesn't go negative
-}
-
-// Update the existing updateLeaveBalance function
-function updateLeaveBalance() {
-  const staffId = document.getElementById('leave-staff-select').value;
-  if (!staffId) {
-    document.getElementById('leave-balance-display').value = '';
-    return;
-  }
-
-  const balance = calculateLeaveBalance(staffId);
-  document.getElementById('leave-balance-display').value = 
-    `${balance.toFixed(1)} days available (${staffMembers.find(s => s.id === staffId).leavesPerMonth} monthly)`;
-}
-
-// ================== DAILY AUTO LEAVE PROCESS ==================
-
-// Run this function daily to process leaves automatically
-async function processDailyAutoLeaves() {
-  const today = new Date().toISOString().split('T')[0];
-  
-  try {
-    // Fetch all staff members
-    const staffSnapshot = await getDocs(staffCollection);
-    const allStaff = staffSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    // Fetch today's attendance
-    const attendanceSnapshot = await getDocs(attendanceCollection);
-    const todayAttendance = attendanceSnapshot.docs
-      .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(att => att.date === today);
-
-    for (const staff of allStaff) {
-      // Find today's attendance for this staff
-      const attendance = todayAttendance.find(att => att.staffId === staff.id);
-      
-      if (!attendance) {
-        // No attendance marked - treat as absent (full day leave)
-        await createAutoLeaveRecord(staff.id, today, 'Auto: No Attendance Marked', 1);
-      } else {
-        // Calculate based on hours worked
-        await calculateAndDeductLeavesForStaff(
-          staff.id, 
-          today, 
-          parseFloat(attendance.hoursWorked || 0), 
-          staff.workingHours
-        );
-      }
-    }
-    
-    console.log('✅ Daily auto leave processing completed');
-  } catch (error) {
-    console.error('Error in daily auto leave processing:', error);
-  }
-}
-
-// ================== MANUAL TRIGGER FOR TESTING ==================
-
-function manuallyProcessAutoLeaves() {
-  if (confirm('Process auto leaves for today? This will deduct leaves based on attendance.')) {
-    processDailyAutoLeaves();
-    alert('Auto leaves processed! Check leave history.');
-  }
 }
 
 // Update leave balance when staff is selected
@@ -4688,7 +4360,7 @@ async function fetchLeaveRecords() {
   }
 }
 
-// Render leave history WITH AUTO LEAVES HIGHLIGHTING
+// Render leave history
 function renderLeaveHistory() {
   const tbody = document.getElementById('leave-history-body');
   if (!tbody) return;
@@ -4708,23 +4380,21 @@ function renderLeaveHistory() {
   filtered.sort((a, b) => new Date(b.appliedOn) - new Date(a.appliedOn));
 
   tbody.innerHTML = filtered.map(leave => `
-    <tr style="${leave.autoGenerated ? 'background: #fff3cd;' : ''}">
-      <td>${leave.staffName} ${leave.autoGenerated ? ' (Auto)' : ''}</td>
-      <td>${leave.leaveType === 'full' ? 'Full Day' : leave.leaveType === 'half' ? 'Half Day' : 'Auto'}</td>
+    <tr style="${leave.autoDeducted ? 'background: #fff3cd;' : ''}">
+      <td>${leave.staffName}</td>
+      <td>${leave.leaveType === 'full' ? 'Full Day' : 'Half Day'} ${leave.autoDeducted ? '🤖' : ''}</td>
       <td>${formatDate(leave.fromDate)}</td>
       <td>${formatDate(leave.toDate)}</td>
       <td>${leave.leaveDays}</td>
       <td>${leave.reason}</td>
       <td>${new Date(leave.appliedOn).toLocaleDateString('en-IN')}</td>
       <td>
-        ${!leave.autoGenerated ? 
-          `<button class="btn btn-sm btn-danger" onclick="deleteLeave('${leave.id}')">Delete</button>` : 
-          '<span style="color:#666; font-style:italic;">Auto</span>'
-        }
+        <button class="btn btn-sm btn-danger" onclick="deleteLeave('${leave.id}')">Delete</button>
       </td>
     </tr>
   `).join('');
 }
+
 // Delete leave
 async function deleteLeave(leaveId) {
   if (!confirm('Delete this leave record?')) return;
