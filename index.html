@@ -3063,25 +3063,26 @@ async function loadShopCashExpenses() {
     return;
   }
 
-  // Clear existing expenses
-  document.getElementById('expenseList').innerHTML = '';
+  // Clear existing expenses first
   cashExpenses = [];
+  document.getElementById('expenseList').innerHTML = '';
 
   // Add each shop expense as an expense item
-  shopCashExpenses.forEach(expense => {
+  shopCashExpenses.forEach((expense, idx) => {
     const container = document.getElementById('expenseList');
-    const index = cashExpenses.length;
+
     const row = document.createElement('div');
     row.className = 'expense-item';
+    row.id = `expense-row-${idx}`;
     row.innerHTML = `
-      <input type="text" id="expDesc${index}" value="Shop Purchase - ${expense.item}" readonly>
-      <input type="number" id="expAmt${index}" step="0.01" value="${(expense.finalOrderTotal || expense.totalCost).toFixed(2)}" oninput="calculateCashBox()">
-      <button class="btn btn-danger btn-small" onclick="removeExpenseItem(${index})">Remove</button>
+      <input type="text" id="expDesc${idx}" value="Shop Purchase - ${expense.item}" readonly>
+      <input type="number" id="expAmt${idx}" step="0.01" value="${(expense.finalItemTotal || expense.totalCost).toFixed(2)}" oninput="calculateCashBox()">
+      <button class="btn btn-danger btn-small" onclick="removeExpenseItem(${idx})">Remove</button>
     `;
     container.appendChild(row);
     cashExpenses.push({ 
       description: `Shop Purchase - ${expense.item}`, 
-      amount: expense.finalOrderTotal || expense.totalCost 
+      amount: expense.finalItemTotal || expense.totalCost 
     });
   });
 
@@ -3105,9 +3106,10 @@ function addExpenseItem() {
 }
 
 function removeExpenseItem(i) {
-  const row = document.getElementById(`expDesc${i}`)?.parentElement;
+  const row = document.getElementById(`expense-row-${i}`);
   if (row) row.remove();
   cashExpenses.splice(i, 1);
+  // Recalculate after removal
   calculateCashBox();
 }
 
