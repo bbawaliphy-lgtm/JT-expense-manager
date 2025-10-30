@@ -4170,50 +4170,68 @@ async function markAbsent(staffId, date) {
     }
   }
 
-  const attendanceData = {
-    staffId,
-    date,
-    status: 'absent',
-    hoursWorked: 0,
-    leaveDeducted: 1,
-    timestamp: new Date().toISOString()
-  };
-
   try {
-    const snapshot = await getDocs(attendanceCollection);
-    let existingDocId = null;
+    // Check if attendance already exists for this date
+    const attendanceSnapshot = await getDocs(attendanceCollection);
+    let existingAttendanceId = null;
     
-    snapshot.docs.forEach(doc => {
+    attendanceSnapshot.docs.forEach(doc => {
       const data = doc.data();
       if (data.staffId === staffId && data.date === date) {
-        existingDocId = doc.id;
+        existingAttendanceId = doc.id;
       }
     });
 
-    if (existingDocId) {
-      await setDoc(doc(attendanceCollection, existingDocId), attendanceData);
+    // Check if leave record already exists for this date
+    const leaveSnapshot = await getDocs(leaveCollection);
+    let existingLeaveForDate = false;
+    
+    leaveSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      if (data.staffId === staffId && data.fromDate === date && data.autoDeducted === true) {
+        existingLeaveForDate = true;
+      }
+    });
+
+    const attendanceData = {
+      staffId,
+      date,
+      status: 'absent',
+      hoursWorked: 0,
+      leaveDeducted: 1,
+      timestamp: new Date().toISOString()
+    };
+
+    // Save or update attendance
+    if (existingAttendanceId) {
+      await setDoc(doc(attendanceCollection, existingAttendanceId), attendanceData);
     } else {
       await addDoc(attendanceCollection, attendanceData);
     }
 
-    // Auto-create leave record
-    const leaveData = {
-      staffId,
-      staffName: staff.name,
-      leaveType: 'full',
-      fromDate: date,
-      toDate: date,
-      leaveDays: 1,
-      reason: 'Auto-deducted: Marked absent',
-      appliedOn: new Date().toISOString(),
-      date: date,
-      autoDeducted: true
-    };
+    // Only create leave record if it doesn't already exist
+    if (!existingLeaveForDate) {
+      const leaveData = {
+        staffId,
+        staffName: staff.name,
+        leaveType: 'full',
+        fromDate: date,
+        toDate: date,
+        leaveDays: 1,
+        reason: 'Auto-deducted: Marked absent',
+        appliedOn: new Date().toISOString(),
+        date: date,
+        autoDeducted: true
+      };
 
-    await addDoc(leaveCollection, leaveData);
-    leaveRecords.push(leaveData);
+      await addDoc(leaveCollection, leaveData);
+      leaveRecords.push(leaveData);
+      
+      alert('✅ Marked as absent. 1 day leave deducted from balance.');
+    } else {
+      alert('✅ Marked as absent. Leave already deducted for this date.');
+    }
 
-    alert('✅ Marked as absent. 1 day leave deducted from balance.');
     loadAttendanceForDate();
   } catch (error) {
     console.error('Error marking absent:', error);
