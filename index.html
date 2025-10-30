@@ -1029,10 +1029,8 @@ body {
 </head>
 <body>
   <!-- 🔐 LOGIN SCREEN (shown first) -->
-<!-- Login screen should be visible first -->
-<div id="login-screen" style="display:block;">
+<div id="login-screen" style="display:flex;">
   <div class="login-card">
-          <!-- 🔥 Logo above login title -->
     <img src="logo.png" alt="Outlet Logo" style="width:80px; margin-bottom:15px;">
     <h2>🔐 JT's Expense Manager</h2>
     <input type="email" id="login-email" placeholder="Enter Email">
@@ -1760,7 +1758,9 @@ body {
     </div>
 
        <script type="module">
-        // ===== FIREBASE IMPORTS & INIT =====
+        
+
+// ===== FIREBASE IMPORTS & INIT =====
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import {
   getFirestore,
@@ -1780,9 +1780,7 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
-           
-
-// Your Firebase config (you gave this earlier)
+// Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyB_C__OZ6dWi1cZOBGOrJxNg_710lPwaxY",
   authDomain: "jt-expense-manager.firebaseapp.com",
@@ -1795,16 +1793,75 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-// Try enabling offline persistence (optional, non-blocking)
-enableIndexedDbPersistence(db).catch(err => console.warn("IndexedDB persistence not enabled:", err && err.code));
-
 const auth = getAuth(app);
 
-// Firestore collection reference
+// Try enabling offline persistence
+enableIndexedDbPersistence(db).catch(err => console.warn("IndexedDB persistence not enabled:", err && err.code));
+
+// Firestore collection references
 const purchasesCollection = collection(db, "purchases");
 const itemSuggestionsCollection = collection(db, "itemSuggestions");
 const supplierSuggestionsCollection = collection(db, "supplierSuggestions");
+
+// ===== AUTHENTICATION HANDLING =====
+
+// Login function
+async function login() {
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+  
+  if (!email || !password) {
+    document.getElementById("login-error").innerText = "Please enter both email and password";
+    return;
+  }
+  
+  try {
+    console.log("Attempting login with:", email);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    console.log("Login successful:", userCredential.user);
+    document.getElementById("login-error").innerText = "";
+  } catch (e) {
+    console.error("Login error:", e);
+    document.getElementById("login-error").innerText = e.message;
+  }
+}
+
+// Logout function
+async function logout() {
+  try {
+    await signOut(auth);
+    console.log("Logout successful");
+  } catch (e) {
+    console.error("Logout error:", e);
+  }
+}
+
+// Listen to login state changes
+onAuthStateChanged(auth, (user) => {
+  console.log("Auth state changed, user:", user);
+  if (user) {
+    // ✅ Logged in: hide login, show app
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app-screen").style.display = "block";
+    
+    // ✅ NOW SET UP FIRESTORE LISTENERS (only when logged in)
+    setupFirestoreListeners();
+    loadData();
+    setTodayDate();
+    generateNextInvoiceNumber();
+    displayRecords();
+    updateSummary();
+    
+  } else {
+    // ❌ Not logged in: show login screen
+    document.getElementById("login-screen").style.display = "flex"; 
+    document.getElementById("app-screen").style.display = "none";
+  }
+});
+
+// Make login/logout available for onclick in HTML
+window.login = login;
+window.logout = logout;
 
 // ===== SETUP FIRESTORE LISTENERS (ONLY AFTER LOGIN) =====
 let listenersInitialized = false;
@@ -1814,7 +1871,9 @@ function setupFirestoreListeners() {
   if (listenersInitialized) return;
   listenersInitialized = true;
 
-  // ===== REAL-TIME SYNC LISTENER =====
+  console.log("Setting up Firestore listeners...");
+
+  // Real-time sync listener
   onSnapshot(purchasesCollection, snapshot => {
     let cloudData = [];
     snapshot.forEach(docSnap => cloudData.push(docSnap.data()));
@@ -1828,7 +1887,7 @@ function setupFirestoreListeners() {
     console.log("🔄 Local data updated in real-time from Firestore.");
   });
 
-  // ===== REAL-TIME SYNC FOR ITEM SUGGESTIONS =====
+  // Real-time sync for item suggestions
   onSnapshot(itemSuggestionsCollection, snapshot => {
     itemSuggestions = [];
     snapshot.forEach(docSnap => {
@@ -1838,7 +1897,7 @@ function setupFirestoreListeners() {
     console.log("🔄 Item suggestions updated from Firestore:", itemSuggestions.length);
   });
 
-  // ===== REAL-TIME SYNC FOR SUPPLIER SUGGESTIONS =====
+  // Real-time sync for supplier suggestions
   onSnapshot(supplierSuggestionsCollection, snapshot => {
     supplierSuggestions = [];
     snapshot.forEach(docSnap => {
@@ -1847,68 +1906,15 @@ function setupFirestoreListeners() {
     renderSupplierSuggestions();
     console.log("🔄 Supplier suggestions updated from Firestore:", supplierSuggestions.length);
   });
-// Setup staff real-time listeners
+
+  // Setup staff real-time listeners
   setupStaffListeners();
 }
 
-
-           // ===== AUTHENTICATION HANDLING =====
-
-// Login function
-async function login() {
-  const email = document.getElementById("login-email").value;
-  const password = document.getElementById("login-password").value;
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    document.getElementById("login-error").innerText = "";
-  } catch (e) {
-    document.getElementById("login-error").innerText = e.message;
-  }
-}
-
-// Logout function
-async function logout() {
-  await signOut(auth);
-}
-
-// Listen to login state changes
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // ✅ Logged in: hide login, show app
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("app-screen").style.display = "block";
-    
-    // ✅ NOW SET UP FIRESTORE LISTENERS (only when logged in)
-    setupFirestoreListeners();
-  } else {
-    // ❌ Not logged in: keep login screen centered
-    document.getElementById("login-screen").style.display = "flex"; 
-    document.getElementById("app-screen").style.display = "none";
-  }
-});
-
-
-// Make login/logout available for onclick in HTML
-window.login = login;
-window.logout = logout;
-
-
-
-           // Save or update a single record to Firestore (non-blocking)
-async function backupSingleRecord(p) {
-    try {
-        const id = `${p.invoice || "INV"}_${(p.item || "Item").toString().replace(/\s+/g, "_")}_${p.date || Date.now()}`.replace(/[^\w\-_.]/g,'_');
-        await setDoc(doc(purchasesCollection, id), p);
-        console.log("Auto-backed up to cloud:", id);
-    } catch (error) {
-        console.warn("Auto-backup failed for:", p, error);
-    }
-}
-
-        // --- Your original code starts here ---
-        let purchases = [];
-        let editingIndex = -1;
-        let itemCounter = 0;
+// --- Rest of your existing code continues here ---
+let purchases = [];
+let editingIndex = -1;
+let itemCounter = 0;
 let lastBackupTimestamp = null;
 let lastSaveTimestamp = null;
 let itemSuggestions = [];     
@@ -1934,11 +1940,12 @@ async function syncFromCloudOnLoad() {
     }
 }
 
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', async function() {
-    loadData();
-    // Replace local with cloud data if cloud has any records
-    await syncFromCloudOnLoad();
+// Initialize app - MODIFIED to work with auth
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log("DOM loaded, waiting for authentication...");
+    // Don't load data here - wait for auth state change
+    // The auth state change listener will handle data loading
+});
 
     setTodayDate();
     await generateNextInvoiceNumber();
