@@ -4117,28 +4117,44 @@ async function saveAttendance(staffId, date, shiftStart, shiftEnd, workingHours)
       await addDoc(attendanceCollection, attendanceData);
     }
 
-    // Auto-create leave record if half-day leave deducted
-    if (leaveDeducted > 0) {
-      const leaveData = {
-        staffId,
-        staffName: staff.name,
-        leaveType: 'half',
-        fromDate: date,
-        toDate: date,
-        leaveDays: leaveDeducted,
-        reason: `Auto-deducted: Worked only ${hoursWorked} hours (half day)`,
-        appliedOn: new Date().toISOString(),
-        date: date,
-        autoDeducted: true
-      };
-
-      await addDoc(leaveCollection, leaveData);
-      leaveRecords.push(leaveData);
-
-      alert(`✅ Attendance saved! ${leaveDeducted} day leave deducted from balance.`);
-    } else {
-      alert('✅ Attendance saved successfully!');
+   // Auto-create leave record if half-day leave deducted
+if (leaveDeducted > 0) {
+  // Check if leave already exists for this date
+  const leaveSnapshot = await getDocs(leaveCollection);
+  let leaveExists = false;
+  
+  leaveSnapshot.docs.forEach(doc => {
+    const data = doc.data();
+    if (data.staffId === staffId && data.fromDate === date) {
+      leaveExists = true;
     }
+  });
+
+  // Only create leave record if it doesn't exist
+  if (!leaveExists) {
+    const leaveData = {
+      staffId,
+      staffName: staff.name,
+      leaveType: 'half',
+      fromDate: date,
+      toDate: date,
+      leaveDays: leaveDeducted,
+      reason: `Auto-deducted: Worked only ${hoursWorked} hours (half day)`,
+      appliedOn: new Date().toISOString(),
+      date: date,
+      autoDeducted: true
+    };
+
+    await addDoc(leaveCollection, leaveData);
+    leaveRecords.push(leaveData);
+
+    alert(`✅ Attendance saved! ${leaveDeducted} day leave deducted from balance.`);
+  } else {
+    alert('✅ Attendance saved! Leave was already deducted for this date.');
+  }
+} else {
+  alert('✅ Attendance saved successfully!');
+}
 
     loadAttendanceForDate();
   } catch (error) {
@@ -4147,7 +4163,7 @@ async function saveAttendance(staffId, date, shiftStart, shiftEnd, workingHours)
   }
 }
 
-// Mark staff as absent
+// Mark staff as absent - FIXED VERSION
 async function markAbsent(staffId, date) {
   if (!confirm('Mark this staff as absent? This will be counted as 1 full day leave and deducted from balance.')) return;
 
@@ -4157,20 +4173,110 @@ async function markAbsent(staffId, date) {
     return;
   }
 
-  // Check if leave balance is available
-  const usedLeaves = leaveRecords
-    .filter(l => l.staffId === staffId && l.date >= getFirstDayOfMonth())
-    .reduce((sum, l) => sum + l.leaveDays, 0);
+  try {
+    // FIRST: Check if leave record already exists for this date
+    const leaveSnapshot = await getDocs(leaveCollection);
+    let existingLeaveForDate = false;
+    let existingLeaveId = null;
+    
+    leaveSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      if (data.staffId === staffId && data.fromDate === date && !data.autoDeducted) {
+        existingLeaveForDate = true;
+        existingLeaveId = doc.id;
+      }
+    });
 
-  const availableBalance = staff.leavesPerMonth - usedLeaves;
+    // If leave already exists manually, don't auto-deduct
+    if (existingLeaveForDate) {
+      const attendanceData = {
+        staffId,
+        date,
+        status: 'absent',
+        hoursWorked: 0,
+        leaveDeducted: 0, // No additional deduction since leave already exists
+        timestamp: new Date().toISOString()
+      };
 
-  if (availableBalance < 1) {
-    if (!confirm(`⚠️ Staff has insufficient leave balance (${availableBalance} days left). Mark as absent anyway?`)) {
+      // Check if attendance already exists for this date
+      const attendanceSnapshot = await getDocs(attendanceCollection);
+      let existingAttendanceId = null;
+      
+      attendanceSnapshot.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.staffId === staffId && data.date === date) {
+          existingAttendanceId = doc.id;
+        }
+      });
+
+      // Save or update attendance
+      if (existingAttendanceId) {
+        await setDoc(doc(attendanceCollection, existingAttendanceId), attendanceData);
+      } else {
+        await addDoc(attendanceCollection, attendanceData);
+      }
+
+      alert('✅ Marked as absent. Leave was already applied manually.');
+      loadAttendanceForDate();
       return;
     }
-  }
 
-  try {
+    // Check if auto-deducted leave already exists for this date
+    let autoLeaveExists = false;
+    leaveSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      if (data.staffId === staffId && data.fromDate === date && data.autoDeducted === true) {
+        autoLeaveExists = true;
+      }
+    });
+
+    // If auto-leave already exists, don't create another one
+    if (autoLeaveExists) {
+      const attendanceData = {
+        staffId,
+        date,
+        status: 'absent',
+        hoursWorked: 0,
+        leaveDeducted: 0, // No additional deduction since leave already exists
+        timestamp: new Date().toISOString()
+      };
+
+      // Check if attendance already exists for this date
+      const attendanceSnapshot = await getDocs(attendanceCollection);
+      let existingAttendanceId = null;
+      
+      attendanceSnapshot.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.staffId === staffId && data.date === date) {
+          existingAttendanceId = doc.id;
+        }
+      });
+
+      // Save or update attendance
+      if (existingAttendanceId) {
+        await setDoc(doc(attendanceCollection, existingAttendanceId), attendanceData);
+      } else {
+        await addDoc(attendanceCollection, attendanceData);
+      }
+
+      alert('✅ Marked as absent. Leave was already auto-deducted.');
+      loadAttendanceForDate();
+      return;
+    }
+
+    // Check leave balance only if we need to deduct new leave
+    const usedLeaves = leaveRecords
+      .filter(l => l.staffId === staffId && l.date >= getFirstDayOfMonth())
+      .reduce((sum, l) => sum + l.leaveDays, 0);
+
+    const availableBalance = staff.leavesPerMonth - usedLeaves;
+
+    if (availableBalance < 1) {
+      if (!confirm(`⚠️ Staff has insufficient leave balance (${availableBalance} days left). Mark as absent anyway without deducting leave?`)) {
+        return;
+      }
+    }
+
     // Check if attendance already exists for this date
     const attendanceSnapshot = await getDocs(attendanceCollection);
     let existingAttendanceId = null;
@@ -4182,23 +4288,12 @@ async function markAbsent(staffId, date) {
       }
     });
 
-    // Check if leave record already exists for this date
-    const leaveSnapshot = await getDocs(leaveCollection);
-    let existingLeaveForDate = false;
-    
-    leaveSnapshot.docs.forEach(doc => {
-      const data = doc.data();
-      if (data.staffId === staffId && data.fromDate === date && data.autoDeducted === true) {
-        existingLeaveForDate = true;
-      }
-    });
-
     const attendanceData = {
       staffId,
       date,
       status: 'absent',
       hoursWorked: 0,
-      leaveDeducted: 1,
+      leaveDeducted: (availableBalance >= 1) ? 1 : 0, // Only deduct if balance available
       timestamp: new Date().toISOString()
     };
 
@@ -4209,8 +4304,8 @@ async function markAbsent(staffId, date) {
       await addDoc(attendanceCollection, attendanceData);
     }
 
-    // Only create leave record if it doesn't already exist
-    if (!existingLeaveForDate) {
+    // Only create leave record if we're deducting leave and it doesn't exist
+    if (attendanceData.leaveDeducted > 0 && !autoLeaveExists) {
       const leaveData = {
         staffId,
         staffName: staff.name,
@@ -4229,7 +4324,7 @@ async function markAbsent(staffId, date) {
       
       alert('✅ Marked as absent. 1 day leave deducted from balance.');
     } else {
-      alert('✅ Marked as absent. Leave already deducted for this date.');
+      alert('✅ Marked as absent. No leave deducted (insufficient balance or leave already exists).');
     }
 
     loadAttendanceForDate();
