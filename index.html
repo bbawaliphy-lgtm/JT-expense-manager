@@ -2619,31 +2619,54 @@ if (tabName === 'cashBox') {
         }
 
         function exportToCSV() {
-            if (purchases.length === 0) {
-                alert('No data to export!');
-                return;
-            }
-            
-            const headers = ['Date', 'Invoice Number', 'Supplier Name', 'Item Name', 'Category', 'Quantity', 'Unit', 'Unit Price', 'Total Cost', 'Payment Mode', 'Remarks'];
-            const csvContent = [
-                headers.join(','),
-                ...purchases.map(p => [
-                    p.date,
-                    `"${p.invoice}"`,
-                    `"${p.supplier}"`,
-                    `"${p.item}"`,
-                    p.category,
-                    p.quantity,
-                    p.unit,
-                    p.unitPrice,
-                    p.totalCost,
-                    p.paymentMode,
-                    `"${(p.remarks || '').replace(/"/g, '""')}"`
-                ].join(','))
-            ].join('\n');
-            
-            downloadFile(csvContent, 'juice_therapy_purchases.csv', 'text/csv');
-        }
+  if (purchases.length === 0) {
+    alert('No data to export!');
+    return;
+  }
+
+  // Add your desired headers
+  const headers = [
+    'Date',
+    'Invoice Number',
+    'Supplier Name',
+    'Item Name',
+    'Category',
+    'Quantity',
+    'Unit',
+    'Unit Price',
+    'Total Cost (Before Discount)',
+    'Discount (₹)',
+    'Other Charges (₹)',
+    'Final Total (₹)',
+    'Payment Mode',
+    'Remarks'
+  ];
+
+  // Build CSV content row by row
+  const csvContent = [
+    headers.join(','),
+    ...purchases.map(p => [
+      p.date,
+      `"${p.invoice}"`,
+      `"${p.supplier}"`,
+      `"${p.item}"`,
+      p.category,
+      p.quantity,
+      p.unit,
+      p.unitPrice,
+      (p.totalCost || 0).toFixed(2),
+      (p.discount || 0).toFixed(2),
+      (p.otherCharges || 0).toFixed(2),
+      (p.finalItemTotal || p.totalCost || 0).toFixed(2), // ✅ key change
+      p.paymentMode,
+      `"${(p.remarks || '').replace(/"/g, '""')}"`
+    ].join(','))
+  ].join('\n');
+
+  // Download as CSV
+  downloadFile(csvContent, 'juice_therapy_purchases.csv', 'text/csv');
+}
+
 
         function exportToJSON() {
             if (purchases.length === 0) {
