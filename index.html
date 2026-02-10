@@ -2355,9 +2355,1049 @@ body {
   }
 }
 
+/* ============================================
+   MODERN ADD PURCHASE ORDER STYLES
+   ============================================ */
+
+#add-tab {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 30px;
+  border-radius: 20px;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+#add-tab h2 {
+  font-size: 2.2em;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.order-header {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+  border-left: 5px solid #667eea;
+  animation: slideInLeft 0.6s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.order-header h3 {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.order-header h3::before {
+  content: "📋";
+  font-size: 1.2em;
+}
+
+.order-header-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9em;
+  color: #4b5563;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1em;
+  transition: all 0.3s ease;
+  background: #f9fafb;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+}
+
+.items-section {
+  margin-bottom: 30px;
+}
+
+.items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.items-header h3 {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.items-header h3::before {
+  content: "📦";
+  font-size: 1.2em;
+}
+
+.add-item-btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.add-item-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+}
+
+.item-row {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #667eea;
+  transition: all 0.3s ease;
+  animation: fadeInScale 0.5s ease-out;
+}
+
+.item-row:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.item-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.item-number {
+  font-weight: 700;
+  font-size: 1.1em;
+  color: #667eea;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.remove-item-btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9em;
+}
+
+.remove-item-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.item-total {
+  margin-top: 15px;
+  padding: 15px;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-radius: 10px;
+  text-align: right;
+  font-size: 1.2em;
+  font-weight: 700;
+  color: #1e40af;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.order-summary {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+  border: 2px solid #667eea;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+  }
+  50% {
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+  }
+}
+
+.order-summary h3 {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.order-summary h3::before {
+  content: "💰";
+  font-size: 1.2em;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  font-size: 1.05em;
+  color: #4b5563;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+  font-size: 1.3em;
+  color: #1f2937;
+  margin-top: 15px;
+  padding-top: 20px;
+  border-top: 3px solid #667eea;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px -15px -15px -15px;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 16px 32px;
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-secondary:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* ============================================
+   MODERN VIEW RECORDS STYLES
+   ============================================ */
+
+#view-tab {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 30px;
+  border-radius: 20px;
+}
+
+#view-tab h2 {
+  font-size: 2.2em;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff6b35 0%, #f093fb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.export-import {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  padding: 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.btn-success {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+}
+
+.filters {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+  border-left: 5px solid #ff6b35;
+}
+
+.filters h3 {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filters h3::before {
+  content: "🔍";
+  font-size: 1.2em;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.table-container {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+thead {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+th {
+  padding: 18px 15px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+th:first-child {
+  border-top-left-radius: 12px;
+}
+
+th:last-child {
+  border-top-right-radius: 12px;
+}
+
+tbody tr {
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+tbody tr:hover {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  transform: scale(1.005);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+td {
+  padding: 15px;
+  color: #4b5563;
+  font-size: 0.95em;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-sm.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.btn-sm.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-sm.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.btn-sm.btn-danger:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #6b7280;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.empty-state .icon {
+  font-size: 5em;
+  display: block;
+  margin-bottom: 20px;
+  animation: bounce 2s infinite;
+}
+
+.empty-state h3 {
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  font-size: 1.1em;
+  color: #6b7280;
+}
+
+/* ============================================
+   MODERN PAYEE SUMMARY STYLES
+   ============================================ */
+
+#payeeSummary-tab {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 30px;
+  border-radius: 20px;
+}
+
+#payeeSummary-tab h2 {
+  font-size: 2.2em;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.payee-filter-section {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+  border-left: 5px solid #f093fb;
+}
+
+.payee-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.payee-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s ease;
+  border-left: 5px solid transparent;
+  animation: fadeInScale 0.6s ease-out backwards;
+}
+
+.payee-card:nth-child(1) {
+  border-left-color: #10b981;
+  animation-delay: 0.1s;
+}
+
+.payee-card:nth-child(2) {
+  border-left-color: #3b82f6;
+  animation-delay: 0.2s;
+}
+
+.payee-card:nth-child(3) {
+  border-left-color: #f59e0b;
+  animation-delay: 0.3s;
+}
+
+.payee-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.payee-card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.payee-icon {
+  font-size: 2.5em;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #f5f7fa, #e8ecf1);
+}
+
+.payee-card-title {
+  flex: 1;
+}
+
+.payee-card-title h3 {
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.payee-card-title p {
+  font-size: 0.9em;
+  color: #6b7280;
+  margin: 5px 0 0 0;
+}
+
+.payee-amount {
+  font-size: 2em;
+  font-weight: 800;
+  color: #1f2937;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.payee-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.payee-detail-item {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.payee-detail-label {
+  font-size: 0.85em;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+
+.payee-detail-value {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: #1f2937;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+#payeeSummaryTable {
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+#payeeSummaryTable th {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  color: white;
+  padding: 18px 15px;
+  text-align: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#payeeSummaryTable td {
+  text-align: center;
+  padding: 15px;
+  border-bottom: 1px solid #f3f4f6;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+
+#payeeSummaryTable tbody tr:hover {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  transform: scale(1.002);
+}
+
+/* Mobile Responsive Enhancements */
+@media (max-width: 768px) {
+  #add-tab,
+  #view-tab,
+  #payeeSummary-tab {
+    padding: 15px;
+  }
+  
+  #add-tab h2,
+  #view-tab h2,
+  #payeeSummary-tab h2 {
+    font-size: 1.8em;
+  }
+  
+  .order-header,
+  .filters,
+  .table-container {
+    padding: 20px;
+  }
+  
+  .order-header-grid,
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .item-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
+  
+  .export-import {
+    flex-direction: column;
+  }
+  
+  .export-import button {
+    width: 100%;
+  }
+  
+  .payee-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .payee-details {
+    grid-template-columns: 1fr;
+  }
+  
+  table {
+    font-size: 0.85em;
+  }
+  
+  th, td {
+    padding: 10px 8px;
+  }
+  
+  .actions {
+    flex-direction: column;
+  }
+  
+  .btn-sm {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  #add-tab h2,
+  #view-tab h2,
+  #payeeSummary-tab h2 {
+    font-size: 1.5em;
+  }
+  
+  .order-header,
+  .filters,
+  .table-container,
+  .payee-filter-section {
+    padding: 15px;
+  }
+  
+  .order-summary {
+    padding: 20px;
+  }
+  
+  .summary-row {
+    font-size: 0.95em;
+  }
+  
+  .item-row {
+    padding: 15px;
+  }
+  
+  .payee-card {
+    padding: 20px;
+  }
+  
+  .payee-amount {
+    font-size: 1.6em;
+  }
+}
+
+/* ============================================
+   TOAST NOTIFICATION SYSTEM
+   ============================================ */
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+}
+
+.toast {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  animation: slideInRight 0.3s ease-out;
+  border-left: 5px solid;
+  min-width: 300px;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast.hiding {
+  animation: slideOutRight 0.3s ease-out forwards;
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+.toast.success {
+  border-left-color: #10b981;
+}
+
+.toast.error {
+  border-left-color: #ef4444;
+}
+
+.toast.info {
+  border-left-color: #3b82f6;
+}
+
+.toast.warning {
+  border-left-color: #f59e0b;
+}
+
+.toast-icon {
+  font-size: 2em;
+  flex-shrink: 0;
+}
+
+.toast-content {
+  flex: 1;
+}
+
+.toast-title {
+  font-weight: 700;
+  font-size: 1.05em;
+  color: #1f2937;
+  margin-bottom: 5px;
+}
+
+.toast-message {
+  font-size: 0.95em;
+  color: #6b7280;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+/* Progress Bar for auto-dismiss */
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  animation: progressBar 3s linear;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+@keyframes progressBar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f4f6;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enhanced Input Focus Effects */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  animation: inputPulse 0.3s ease-out;
+}
+
+@keyframes inputPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Tooltip System */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  background: #1f2937;
+  color: white;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.85em;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #1f2937 transparent transparent transparent;
+}
+
+.tooltip-wrapper:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Pulse Animation for Important Elements */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+  }
+}
+
+.pulse-glow {
+  animation: pulseGlow 2s infinite;
+}
+
+/* Mobile Toast Adjustments */
+@media (max-width: 768px) {
+  .toast-container {
+    right: 10px;
+    left: 10px;
+    top: 10px;
+    max-width: none;
+  }
+  
+  .toast {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
     </style>
 </head>
 <body>
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+  
   <!-- 🔐 LOGIN SCREEN (shown first) -->
 <!-- Login screen should be visible first -->
 <div id="login-screen" style="display:block;">
@@ -2402,7 +3442,7 @@ body {
             <button class="nav-tab" onclick="showTab('payeeSummary')">Payee Summary</button>
 <button class="nav-tab" onclick="showTab('cashBox')">Cash Box</button>
 <button class="nav-tab" onclick="showTab('staff')">Staff Management</button>
-
+<button class="nav-tab" onclick="showTab('settings')">⚙️ Settings & More</button>
 
         </div>
 
@@ -2787,37 +3827,55 @@ body {
     </div>
 
 <!-- 🔹 PAYEE SUMMARY TAB -->
-<div id="payeeSummary-tab" class="tab-content" style="display:none; padding:15px;">
-  <h2>Payee Summary</h2>
+<div id="payeeSummary-tab" class="tab-content" style="display:none;">
+  <h2>💳 Payee Summary Dashboard</h2>
 
-  <div style="margin-bottom:10px;">
-    <label>Filter Payee:</label>
-    <select id="filterPayee" onchange="renderPayeeSummary()" style="padding:4px 6px;">
-      <option value="All">All</option>
-      <option value="Shop">Shop</option>
-      <option value="Dyutimala">Dyutimala</option>
-      <option value="Others">Others</option>
-    </select>
+  <!-- Filter Section with Modern Design -->
+  <div class="payee-filter-section">
+    <h3>🔍 Filter Options</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+      <div class="form-group">
+        <label for="filterPayee">Select Payee</label>
+        <select id="filterPayee" onchange="renderPayeeSummary()">
+          <option value="All">All Payees</option>
+          <option value="Shop">Shop</option>
+          <option value="Dyutimala">Dyutimala</option>
+          <option value="Others">Others</option>
+        </select>
+      </div>
 
-    <label style="margin-left:15px;">From:</label>
-    <input type="date" id="filterFrom" onchange="renderPayeeSummary()" style="padding:4px;">
+      <div class="form-group">
+        <label for="filterFrom">From Date</label>
+        <input type="date" id="filterFrom" onchange="renderPayeeSummary()">
+      </div>
 
-    <label style="margin-left:5px;">To:</label>
-    <input type="date" id="filterTo" onchange="renderPayeeSummary()" style="padding:4px;">
+      <div class="form-group">
+        <label for="filterTo">To Date</label>
+        <input type="date" id="filterTo" onchange="renderPayeeSummary()">
+      </div>
 
-    <button onclick="exportPayeeSummaryToExcel()" style="margin-left:15px;background:green;color:white;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;">
-      📊 Export to Excel
-    </button>
+      <div class="form-group" style="display: flex; align-items: flex-end;">
+        <button onclick="exportPayeeSummaryToExcel()" class="btn-success" style="width: 100%;">
+          📊 Export to Excel
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div style="overflow-x:auto;">
-    <table id="payeeSummaryTable" border="1" style="width:100%; border-collapse:collapse;">
+  <!-- Payee Cards Grid -->
+  <div class="payee-cards-grid" id="payee-cards-container">
+    <!-- Cards will be dynamically inserted here -->
+  </div>
+
+  <!-- Detailed Table -->
+  <div class="table-container">
+    <table id="payeeSummaryTable">
       <thead>
         <tr>
           <th>Payee</th>
           <th>Payment Mode</th>
           <th>Orders</th>
-          <th>Total (₹)</th>
+          <th>Total Amount</th>
         </tr>
       </thead>
       <tbody id="payee-summary-body"></tbody>
@@ -3781,6 +4839,61 @@ async function generateNextInvoiceNumber() {
 }
 
 
+// ============================================
+// TOAST NOTIFICATION SYSTEM
+// ============================================
+
+function showToast(type, title, message, duration = 3000) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  
+  const icons = {
+    success: '✅',
+    error: '❌',
+    info: 'ℹ️',
+    warning: '⚠️'
+  };
+  
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <div class="toast-icon">${icons[type] || '📢'}</div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+    ${duration > 0 ? '<div class="toast-progress"></div>' : ''}
+  `;
+  
+  container.appendChild(toast);
+  
+  // Auto dismiss after duration
+  if (duration > 0) {
+    setTimeout(() => {
+      toast.classList.add('hiding');
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+}
+
+// Helper functions for common toast types
+function showSuccess(message, title = 'Success!') {
+  showToast('success', title, message);
+}
+
+function showError(message, title = 'Error!') {
+  showToast('error', title, message);
+}
+
+function showInfo(message, title = 'Info') {
+  showToast('info', title, message);
+}
+
+function showWarning(message, title = 'Warning!') {
+  showToast('warning', title, message);
+}
+
        function saveOrder() {
     // Validate order header
     const orderDate = document.getElementById('order-date').value;
@@ -3792,7 +4905,7 @@ async function generateNextInvoiceNumber() {
     const orderOtherCharges = parseFloat(document.getElementById('order-other-charges').value) || 0;
 
     if (!orderDate || !orderInvoice || !orderSupplier || !orderPayment) {
-        alert('Please fill in all required order information fields.');
+        showError('Please fill in all required order information fields.', 'Validation Error');
         return;
     }
 
@@ -3835,12 +4948,12 @@ async function generateNextInvoiceNumber() {
     });
 
     if (!isValid) {
-        alert('Please fill in all required item fields.');
+        showError('Please fill in all required item fields.', 'Validation Error');
         return;
     }
 
     if (orderItems.length === 0) {
-        alert('Please add at least one item to the order.');
+        showError('Please add at least one item to the order.', 'No Items');
         return;
     }
 
@@ -3870,7 +4983,7 @@ async function generateNextInvoiceNumber() {
     orderItems.forEach(p => backupSingleRecord(p));
     resetOrderForm();
 
-    alert(`✅ Order saved successfully! Added ${orderItems.length} items to inventory.`);
+    showSuccess(`Added ${orderItems.length} items to inventory successfully!`, 'Order Saved!');
 }
 
 
@@ -5399,6 +6512,7 @@ if (payeeSelect && paymentModeSelect) {
 // ================= PAYEE SUMMARY LOGIC =================
 function renderPayeeSummary() {
   const tbody = document.getElementById("payee-summary-body");
+  const cardsContainer = document.getElementById("payee-cards-container");
   if (!tbody) return;
 
   const payeeFilter = document.getElementById("filterPayee").value;
@@ -5415,28 +6529,96 @@ function renderPayeeSummary() {
   });
 
   const summary = {};
+  const payeeTotals = {};
+  
   filtered.forEach(p => {
     const key = `${p.payee}-${p.paymentMode}`;
     if (!summary[key]) summary[key] = { payee: p.payee, paymentMode: p.paymentMode, orders: 0, total: 0 };
     summary[key].orders += 1;
     summary[key].total += parseFloat(p.finalItemTotal || p.totalCost || 0);
+    
+    // Calculate totals per payee for cards
+    if (!payeeTotals[p.payee]) {
+      payeeTotals[p.payee] = { total: 0, orders: 0, modes: new Set() };
+    }
+    payeeTotals[p.payee].total += parseFloat(p.finalItemTotal || p.totalCost || 0);
+    payeeTotals[p.payee].orders += 1;
+    payeeTotals[p.payee].modes.add(p.paymentMode);
   });
 
+  // Render Cards
+  if (cardsContainer) {
+    cardsContainer.innerHTML = "";
+    const payeeIcons = {
+      'Shop': '🏪',
+      'Dyutimala': '👤',
+      'Others': '📋'
+    };
+    
+    Object.keys(payeeTotals).forEach(payeeName => {
+      const data = payeeTotals[payeeName];
+      const icon = payeeIcons[payeeName] || '💼';
+      const modesCount = data.modes.size;
+      
+      const card = document.createElement('div');
+      card.className = 'payee-card';
+      card.innerHTML = `
+        <div class="payee-card-header">
+          <div class="payee-icon">${icon}</div>
+          <div class="payee-card-title">
+            <h3>${payeeName}</h3>
+            <p>${modesCount} Payment Mode${modesCount > 1 ? 's' : ''}</p>
+          </div>
+        </div>
+        <div class="payee-amount">₹${data.total.toFixed(2)}</div>
+        <div class="payee-details">
+          <div class="payee-detail-item">
+            <div class="payee-detail-label">Total Orders</div>
+            <div class="payee-detail-value">${data.orders}</div>
+          </div>
+          <div class="payee-detail-item">
+            <div class="payee-detail-label">Avg Order</div>
+            <div class="payee-detail-value">₹${(data.total / data.orders).toFixed(2)}</div>
+          </div>
+        </div>
+      `;
+      cardsContainer.appendChild(card);
+    });
+    
+    if (Object.keys(payeeTotals).length === 0) {
+      cardsContainer.innerHTML = `
+        <div class="empty-state" style="grid-column: 1/-1;">
+          <span class="icon">📊</span>
+          <h3>No Data Available</h3>
+          <p>No payee records found for the selected filters</p>
+        </div>
+      `;
+    }
+  }
+
+  // Render Table
   tbody.innerHTML = "";
 
   const keys = Object.keys(summary);
   if (keys.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No records found</td></tr>`;
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="empty-state">
+          <span class="icon">📋</span>
+          <h3>No records found</h3>
+          <p>Try adjusting your filters</p>
+        </td>
+      </tr>`;
     return;
   }
 
   keys.forEach(key => {
     const { payee, paymentMode, orders, total } = summary[key];
     const row = `<tr>
-      <td>${payee}</td>
+      <td><strong>${payee}</strong></td>
       <td>${paymentMode}</td>
       <td>${orders}</td>
-      <td>${total.toFixed(2)}</td>
+      <td><strong>₹${total.toFixed(2)}</strong></td>
     </tr>`;
     tbody.insertAdjacentHTML("beforeend", row);
   });
