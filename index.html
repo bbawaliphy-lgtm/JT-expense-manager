@@ -1025,6 +1025,451 @@ body {
   }
 }
 
+/* ============================================
+   MODERN DASHBOARD STYLES
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+.dashboard-container {
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  padding: 30px;
+  border-radius: 20px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 40px;
+  animation: slideDown 0.8s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-title {
+  font-size: 2.8em;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 10px 0;
+  letter-spacing: -1px;
+}
+
+.title-icon {
+  font-size: 1.2em;
+  display: inline-block;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.dashboard-subtitle {
+  font-size: 1.1em;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.metric-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: cardSlideIn 0.8s ease-out backwards;
+}
+
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.metric-card-1 { animation-delay: 0.1s; }
+.metric-card-2 { animation-delay: 0.2s; }
+.metric-card-3 { animation-delay: 0.3s; }
+.metric-card-4 { animation-delay: 0.4s; }
+
+.metric-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.metric-card:hover::before {
+  transform: scaleX(1);
+}
+
+.metric-card-1::before { background: linear-gradient(90deg, #f093fb, #f5576c); }
+.metric-card-2::before { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+.metric-card-3::before { background: linear-gradient(90deg, #43e97b, #38f9d7); }
+.metric-card-4::before { background: linear-gradient(90deg, #fa709a, #fee140); }
+
+.metric-icon {
+  font-size: 3.5em;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f5f7fa, #e8ecf1);
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.metric-card:hover .metric-icon {
+  transform: rotate(10deg) scale(1.1);
+}
+
+.metric-content {
+  flex: 1;
+}
+
+.metric-label {
+  font-size: 0.95em;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.metric-value {
+  font-size: 2.2em;
+  font-weight: 800;
+  color: #1f2937;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.metric-trend {
+  font-size: 0.9em;
+  color: #10b981;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  animation: fadeInScale 0.8s ease-out backwards;
+}
+
+.chart-card:nth-child(1) { animation-delay: 0.2s; }
+.chart-card:nth-child(2) { animation-delay: 0.3s; }
+.chart-card:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.chart-card:hover {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+}
+
+.chart-card-wide {
+  grid-column: 1 / -1;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.chart-header h3 {
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.chart-toggle {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chart-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 300px;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 0.85em;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+/* Data Table */
+.data-table-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  animation: fadeInUp 1s ease-out backwards;
+  animation-delay: 0.5s;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.table-header h3 {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.export-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95em;
+}
+
+.export-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.modern-table thead {
+  background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+}
+
+.modern-table th {
+  padding: 18px 20px;
+  text-align: left;
+  font-weight: 700;
+  color: #374151;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.modern-table th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.modern-table th:last-child {
+  border-top-right-radius: 12px;
+}
+
+.modern-table tbody tr {
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.modern-table tbody tr:hover {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.modern-table td {
+  padding: 18px 20px;
+  color: #4b5563;
+  font-size: 0.95em;
+}
+
+.category-bar {
+  height: 8px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  margin-top: 5px;
+}
+
+.trend-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.trend-up {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.trend-down {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.trend-neutral {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-card-wide {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 20px;
+  }
+  
+  .dashboard-title {
+    font-size: 2em;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .metric-card {
+    padding: 20px;
+  }
+  
+  .chart-wrapper {
+    height: 250px;
+  }
+  
+  .modern-table {
+    font-size: 0.85em;
+  }
+}
+
     </style>
 </head>
 <body>
@@ -1294,42 +1739,119 @@ body {
             </div>
         </div>
 
-        <!-- Summary Tab -->
+        <!-- Summary Tab - Modern Dashboard -->
         <div id="summary-tab" class="tab-content">
-            <h2>Expense Summary</h2>
-            <div class="summary-cards">
-                <div class="summary-card">
-                    <h3 id="today-total">₹0</h3>
-                    <p>Today's Expenses</p>
+            <div class="dashboard-container">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title">
+                        <span class="title-icon">📊</span>
+                        Expense Analytics Dashboard
+                    </h2>
+                    <div class="dashboard-subtitle">Real-time insights into your business expenses</div>
                 </div>
-                <div class="summary-card">
-                    <h3 id="month-total">₹0</h3>
-                    <p>This Month</p>
-                </div>
-                <div class="summary-card">
-                    <h3 id="overall-total">₹0</h3>
-                    <p>Total Expenses</p>
-                </div>
-                <div class="summary-card">
-                    <h3 id="record-count">0</h3>
-                    <p>Total Records</p>
-                </div>
-            </div>
 
-            <div class="table-container">
-                <h3 style="margin-bottom: 15px;">Category-wise Summary</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Total Amount</th>
-                            <th>Records Count</th>
-                            <th>Percentage</th>
-                        </tr>
-                    </thead>
-                    <tbody id="category-summary">
-                    </tbody>
-                </table>
+                <!-- Key Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card metric-card-1">
+                        <div class="metric-icon">💰</div>
+                        <div class="metric-content">
+                            <div class="metric-label">Today's Expenses</div>
+                            <div class="metric-value" id="today-total">₹0</div>
+                            <div class="metric-trend" id="today-trend">—</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card metric-card-2">
+                        <div class="metric-icon">📅</div>
+                        <div class="metric-content">
+                            <div class="metric-label">This Month</div>
+                            <div class="metric-value" id="month-total">₹0</div>
+                            <div class="metric-trend" id="month-trend">—</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card metric-card-3">
+                        <div class="metric-icon">💳</div>
+                        <div class="metric-content">
+                            <div class="metric-label">Total Expenses</div>
+                            <div class="metric-value" id="overall-total">₹0</div>
+                            <div class="metric-trend" id="overall-avg">Avg: ₹0/day</div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card metric-card-4">
+                        <div class="metric-icon">📋</div>
+                        <div class="metric-content">
+                            <div class="metric-label">Total Records</div>
+                            <div class="metric-value" id="record-count">0</div>
+                            <div class="metric-trend" id="record-avg">Avg: 0/day</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <!-- Category Distribution Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Category Distribution</h3>
+                            <div class="chart-legend" id="category-legend"></div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Payment Mode Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Payment Methods</h3>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="paymentChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Spending Trend Chart -->
+                    <div class="chart-card chart-card-wide">
+                        <div class="chart-header">
+                            <h3>Daily Spending Trend (Last 30 Days)</h3>
+                            <button class="chart-toggle" onclick="toggleTrendView()">
+                                <span id="trend-view-text">Week</span>
+                            </button>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Categories Table -->
+                <div class="data-table-card">
+                    <div class="table-header">
+                        <h3>Category Breakdown</h3>
+                        <button class="export-btn" onclick="exportSummaryPDF()">
+                            📄 Export PDF
+                        </button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Orders</th>
+                                    <th>Avg/Order</th>
+                                    <th>Share</th>
+                                    <th>Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody id="category-summary">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1781,6 +2303,9 @@ body {
             </form>
         </div>
     </div>
+
+    <!-- Chart.js for Dashboard Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
        <script type="module">
         // ===== FIREBASE IMPORTS & INIT =====
@@ -2672,34 +3197,59 @@ if (tabName === 'cashBox') {
             let monthTotal = 0;
             let overallTotal = 0;
             const categoryTotals = {};
+            const paymentModeTotals = {};
+            const dailyTotals = {};
             
             purchases.forEach(purchase => {
-    const purchaseDate = new Date(purchase.date);
-    const amount = purchase.finalItemTotal || purchase.totalCost;  // ✅ Use individual item's final total
-    
-    overallTotal += amount;
-    
-    if (purchase.date === today) {
-        todayTotal += amount;
-    }
-    
-    if (purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear) {
-        monthTotal += amount;
-    }
-    
-    if (!categoryTotals[purchase.category]) {
-        categoryTotals[purchase.category] = { amount: 0, count: 0 };
-    }
-    categoryTotals[purchase.category].amount += amount;
-    categoryTotals[purchase.category].count += 1;
-});
+                const purchaseDate = new Date(purchase.date);
+                const amount = purchase.finalItemTotal || purchase.totalCost;
+                
+                overallTotal += amount;
+                
+                if (purchase.date === today) {
+                    todayTotal += amount;
+                }
+                
+                if (purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear) {
+                    monthTotal += amount;
+                }
+                
+                // Category totals
+                if (!categoryTotals[purchase.category]) {
+                    categoryTotals[purchase.category] = { amount: 0, count: 0 };
+                }
+                categoryTotals[purchase.category].amount += amount;
+                categoryTotals[purchase.category].count += 1;
+                
+                // Payment mode totals
+                const paymentMode = purchase.paymentMode || 'Unknown';
+                if (!paymentModeTotals[paymentMode]) {
+                    paymentModeTotals[paymentMode] = 0;
+                }
+                paymentModeTotals[paymentMode] += amount;
+                
+                // Daily totals for trend chart
+                if (!dailyTotals[purchase.date]) {
+                    dailyTotals[purchase.date] = 0;
+                }
+                dailyTotals[purchase.date] += amount;
+            });
             
+            // Update metric cards
             document.getElementById('today-total').textContent = `₹${todayTotal.toFixed(2)}`;
             document.getElementById('month-total').textContent = `₹${monthTotal.toFixed(2)}`;
             document.getElementById('overall-total').textContent = `₹${overallTotal.toFixed(2)}`;
             document.getElementById('record-count').textContent = purchases.length;
             
-            // Update category summary
+            // Calculate averages
+            const daysWithData = Object.keys(dailyTotals).length;
+            const avgPerDay = daysWithData > 0 ? (overallTotal / daysWithData).toFixed(2) : 0;
+            const recordsPerDay = daysWithData > 0 ? (purchases.length / daysWithData).toFixed(1) : 0;
+            
+            document.getElementById('overall-avg').textContent = `Avg: ₹${avgPerDay}/day`;
+            document.getElementById('record-avg').textContent = `Avg: ${recordsPerDay}/day`;
+            
+            // Update category summary table
             const categorySummary = document.getElementById('category-summary');
             const sortedCategories = Object.entries(categoryTotals)
                 .sort(([,a], [,b]) => b.amount - a.amount);
@@ -2707,27 +3257,285 @@ if (tabName === 'cashBox') {
             if (sortedCategories.length === 0) {
                 categorySummary.innerHTML = `
                     <tr>
-                        <td colspan="4" class="empty-state">
+                        <td colspan="6" class="empty-state">
                             <span class="icon">📊</span>
                             <h3>No data available</h3>
-                            <p>Add some purchase records to see category summary</p>
+                            <p>Add some purchase records to see analytics</p>
                         </td>
                     </tr>
                 `;
-                return;
+            } else {
+                categorySummary.innerHTML = sortedCategories.map(([category, data]) => {
+                    const percentage = overallTotal > 0 ? (data.amount / overallTotal * 100) : 0;
+                    const avgPerOrder = data.count > 0 ? (data.amount / data.count) : 0;
+                    
+                    return `
+                        <tr>
+                            <td><strong>${category}</strong></td>
+                            <td><strong>₹${data.amount.toFixed(2)}</strong></td>
+                            <td>${data.count}</td>
+                            <td>₹${avgPerOrder.toFixed(2)}</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span>${percentage.toFixed(1)}%</span>
+                                    <div class="category-bar" style="width: ${percentage}%; max-width: 100px;"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="trend-indicator trend-neutral">—</span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
             }
             
-            categorySummary.innerHTML = sortedCategories.map(([category, data]) => {
-                const percentage = overallTotal > 0 ? (data.amount / overallTotal * 100).toFixed(1) : 0;
-                return `
-                    <tr>
-                        <td>${category}</td>
-                        <td>₹${data.amount.toFixed(2)}</td>
-                        <td>${data.count}</td>
-                        <td>${percentage}%</td>
-                    </tr>
-                `;
-            }).join('');
+            // Create charts
+            createCategoryChart(categoryTotals);
+            createPaymentChart(paymentModeTotals);
+            createTrendChart(dailyTotals);
+        }
+
+        // Chart instances
+        let categoryChartInstance = null;
+        let paymentChartInstance = null;
+        let trendChartInstance = null;
+        let currentTrendView = 'month'; // 'week' or 'month'
+
+        function createCategoryChart(categoryTotals) {
+            const ctx = document.getElementById('categoryChart');
+            if (!ctx) return;
+            
+            // Destroy existing chart
+            if (categoryChartInstance) {
+                categoryChartInstance.destroy();
+            }
+            
+            const sortedCategories = Object.entries(categoryTotals)
+                .sort(([,a], [,b]) => b.amount - a.amount);
+            
+            const labels = sortedCategories.map(([cat]) => cat);
+            const data = sortedCategories.map(([,data]) => data.amount);
+            
+            const colors = [
+                '#667eea', '#764ba2', '#f093fb', '#4facfe', 
+                '#00f2fe', '#43e97b', '#38f9d7', '#fa709a'
+            ];
+            
+            categoryChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 13 },
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `₹${value.toFixed(2)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+            
+            // Create custom legend
+            const legendEl = document.getElementById('category-legend');
+            if (legendEl) {
+                legendEl.innerHTML = labels.map((label, i) => `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: ${colors[i]}"></div>
+                        <span>${label}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function createPaymentChart(paymentModeTotals) {
+            const ctx = document.getElementById('paymentChart');
+            if (!ctx) return;
+            
+            if (paymentChartInstance) {
+                paymentChartInstance.destroy();
+            }
+            
+            const labels = Object.keys(paymentModeTotals);
+            const data = Object.values(paymentModeTotals);
+            
+            const colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
+            
+            paymentChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Amount (₹)',
+                        data: data,
+                        backgroundColor: colors,
+                        borderRadius: 10,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return `₹${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toFixed(0);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        function createTrendChart(dailyTotals) {
+            const ctx = document.getElementById('trendChart');
+            if (!ctx) return;
+            
+            if (trendChartInstance) {
+                trendChartInstance.destroy();
+            }
+            
+            // Get last 30 days
+            const days = currentTrendView === 'week' ? 7 : 30;
+            const today = new Date();
+            const labels = [];
+            const data = [];
+            
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                labels.push(date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }));
+                data.push(dailyTotals[dateStr] || 0);
+            }
+            
+            trendChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Daily Expenses',
+                        data: data,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return `₹${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toFixed(0);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        function toggleTrendView() {
+            currentTrendView = currentTrendView === 'week' ? 'month' : 'week';
+            document.getElementById('trend-view-text').textContent = 
+                currentTrendView === 'week' ? 'Month' : 'Week';
+            updateSummary();
+        }
+
+        function exportSummaryPDF() {
+            alert('PDF export feature coming soon! You can use "Print to PDF" from your browser for now.');
         }
 
         function exportToCSV() {
@@ -3237,6 +4045,11 @@ window.redownloadBackup = redownloadBackup;
 
 window.renderPayeeSummary = renderPayeeSummary;
 window.exportPayeeSummaryToExcel = exportPayeeSummaryToExcel;
+
+// Dashboard functions
+window.toggleTrendView = toggleTrendView;
+window.exportSummaryPDF = exportSummaryPDF;
+window.updateSummary = updateSummary;
 
 // Expose new helpers if you want to call them manually
 window.backupSingleRecord = backupSingleRecord;
