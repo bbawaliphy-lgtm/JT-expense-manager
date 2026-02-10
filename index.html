@@ -1846,6 +1846,12 @@ function setupFirestoreListeners() {
     renderSupplierSuggestions();
     console.log("🔄 Supplier suggestions updated from Firestore:", supplierSuggestions.length);
   });
+// Add this inside setupFirestoreListeners()
+onSnapshot(cashBoxCollection, snapshot => {
+  cashBoxRecords = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  renderCashBoxHistory(cashBoxRecords);
+  console.log("🔄 Cash Box history synced in real-time.");
+});
 // Setup staff real-time listeners
   setupStaffListeners();
 }
@@ -2353,72 +2359,81 @@ if (tabName === 'cashBox') {
 
 
         function displayRecords() {
-            const tbody = document.getElementById('records-tbody');
-            const filteredRecords = getFilteredRecords();
-            
-            if (filteredRecords.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="11" class="empty-state">
-                            <span class="icon">📋</span>
-                            <h3>No records found</h3>
-                            <p>Add some purchase records or adjust your filters</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            tbody.innerHTML = filteredRecords.map((purchase) => `
-                <tr>
-                    <td>${formatDate(purchase.date)}</td>
-                    <td>${purchase.invoice}</td>
-                    <td>${purchase.supplier}</td>
-                    <td>${purchase.item}</td>
-                    <td>${purchase.category}</td>
-                    <td>${purchase.quantity}</td>
-                    <td>${purchase.unit}</td>
-                    <td>₹${purchase.unitPrice.toFixed(2)}</td>
-                    <td>₹${purchase.totalCost.toFixed(2)}</td>
-                    <td>${purchase.paymentMode || 'N/A'}</td>
-                    <td>₹${(purchase.discount || 0).toFixed(2)}</td>
-                    <td>₹${(purchase.otherCharges || 0).toFixed(2)}</td>
-                    <td>₹${(purchase.finalItemTotal || purchase.totalCost).toFixed(2)}</td>
-                    <td class="actions">
-                        <button class="btn btn-sm btn-primary" onclick="editRecord(${purchases.indexOf(purchase)})">Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteRecord(${purchases.indexOf(purchase)})">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+    const tbody = document.getElementById('records-tbody');
+    // Ensure we are getting the results from our filter logic
+    const filteredRecords = getFilteredRecords();
+    
+    if (filteredRecords.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="14" class="empty-state">
+                    <span class="icon">📋</span>
+                    <h3>No records found</h3>
+                    <p>Add some purchase records or adjust your filters</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // Map through the filtered list instead of the main purchases array
+    tbody.innerHTML = filteredRecords.map((purchase) => {
+        // Find the actual index in the main 'purchases' array for edit/delete actions
+        const actualIndex = purchases.indexOf(purchase);
+        
+        return `
+            <tr>
+                <td>${formatDate(purchase.date)}</td>
+                <td>${purchase.invoice}</td>
+                <td>${purchase.supplier}</td>
+                <td>${purchase.item}</td>
+                <td>${purchase.category}</td>
+                <td>${purchase.quantity}</td>
+                <td>${purchase.unit}</td>
+                <td>₹${(purchase.unitPrice || 0).toFixed(2)}</td>
+                <td>₹${(purchase.totalCost || 0).toFixed(2)}</td>
+                <td>${purchase.paymentMode || 'N/A'}</td>
+                <td>₹${(purchase.discount || 0).toFixed(2)}</td>
+                <td>₹${(purchase.otherCharges || 0).toFixed(2)}</td>
+                <td>₹${(purchase.finalItemTotal || purchase.totalCost || 0).toFixed(2)}</td>
+                <td class="actions">
+                    <button class="btn btn-sm btn-primary" onclick="editRecord(${actualIndex})">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteRecord(${actualIndex})">Delete</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
 
         function getFilteredRecords() {
-            let filtered = [...purchases];
-            
-            const dateFrom = document.getElementById('filter-date-from').value;
-            const dateTo = document.getElementById('filter-date-to').value;
-            const invoice = document.getElementById('filter-invoice').value.toLowerCase();
-            const item = document.getElementById('filter-item').value.toLowerCase();
-            const category = document.getElementById('filter-category').value;
-            
-            if (dateFrom) {
-                filtered = filtered.filter(p => p.date >= dateFrom);
-            }
-            if (dateTo) {
-                filtered = filtered.filter(p => p.date <= dateTo);
-            }
-            if (invoice) {
-                filtered = filtered.filter(p => p.invoice.toLowerCase().includes(invoice));
-            }
-            if (item) {
-                filtered = filtered.filter(p => p.item.toLowerCase().includes(item));
-            }
-            if (category) {
-                filtered = filtered.filter(p => p.category === category);
-            }
-            
-            return filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-        }
+    let filtered = [...purchases];
+    
+    const dateFrom = document.getElementById('filter-date-from').value;
+    const dateTo = document.getElementById('filter-date-to').value;
+    const invoice = document.getElementById('filter-invoice').value.toLowerCase().trim();
+    const item = document.getElementById('filter-item').value.toLowerCase().trim();
+    const category = document.getElementById('filter-category').value;
+    
+    // Apply each filter if a value exists
+    if (dateFrom) {
+        filtered = filtered.filter(p => p.date >= dateFrom);
+    }
+    if (dateTo) {
+        filtered = filtered.filter(p => p.date <= dateTo);
+    }
+    if (invoice) {
+        filtered = filtered.filter(p => p.invoice && p.invoice.toLowerCase().includes(invoice));
+    }
+    if (item) {
+        filtered = filtered.filter(p => p.item && p.item.toLowerCase().includes(item));
+    }
+    if (category) {
+        filtered = filtered.filter(p => p.category === category);
+    }
+    
+    // Sort by date descending (newest first)
+    return filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+}
 
         function applyFilters() {
             displayRecords();
@@ -3658,9 +3673,12 @@ function renderCashBoxHistory(records) {
   tbody.innerHTML = "";
 
   if (records.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">No records available</td></tr>`;
-    return;
-  }
+  // If listenersInitialized is true but array is empty, then it's truly empty
+  tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;">
+    ${listenersInitialized ? "No records found for this date." : "Connecting to database..."}
+  </td></tr>`;
+  return;
+}
 
   records.sort((a, b) => new Date(b.date) - new Date(a.date));
   records.forEach(r => {
@@ -3738,7 +3756,6 @@ function exportCashBoxToExcel() {
 
 // Initialize when tab opens
 function openCashBoxTab() {
-  fetchCashBoxRecords();
   loadPreviousDayBalance(); // ✅ Auto-load previous balance
 }
 
