@@ -1448,6 +1448,7 @@ body {
   <label>Search by Date:</label>
   <input type="date" id="searchCashDate" onchange="filterCashBoxHistory()">
   <button onclick="exportCashBoxToExcel()" style="background:green;color:white;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;">📊 Export to Excel</button>
+  <button onclick="debugCashBoxRecords()" style="background:blue;color:white;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;margin-left:5px;">🔍 Debug Records</button>
 </div>
 
 <div style="overflow-x:auto;">
@@ -1890,11 +1891,22 @@ onSnapshot(cashBoxCollection,
         console.log(`💰 Cash Box sync: ${source} (${snapshot.docs.length} records, pending writes: ${hasPendingWrites})`);
 
         // Update the global variable with ALL documents currently in the collection
-        cashBoxRecords = snapshot.docs.map(doc => ({ 
-            id: doc.id, 
-            ...doc.data(),
-            _source: source  // Track data source for debugging
-        }));
+        cashBoxRecords = [];
+        snapshot.docs.forEach(docSnapshot => {
+            const data = docSnapshot.data();
+            const record = { 
+                id: docSnapshot.id, 
+                ...data,
+                _source: source  // Track data source for debugging
+            };
+            
+            // Log each record for debugging
+            console.log(`  📅 Record: ${data.date || 'NO DATE'} - ID: ${docSnapshot.id}`);
+            
+            cashBoxRecords.push(record);
+        });
+        
+        console.log(`💾 Total cashBoxRecords loaded: ${cashBoxRecords.length}`);
 
         // Update sync status
         isSyncing = snapshot.metadata.fromCache && snapshot.docs.length === 0;
@@ -3710,6 +3722,29 @@ window.openCashBoxTab = openCashBoxTab || ( () => fetchCashBoxRecords && fetchCa
 window.filterCashBoxHistory = filterCashBoxHistory || (()=>{});
 window.exportCashBoxToExcel = exportCashBoxToExcel || (()=>{});
 
+// Debug function to check what's in memory
+function debugCashBoxRecords() {
+    console.log('=== CASH BOX RECORDS DEBUG ===');
+    console.log('Total records in memory:', cashBoxRecords.length);
+    console.log('Records:', cashBoxRecords);
+    
+    // Group by date
+    const byDate = {};
+    cashBoxRecords.forEach(r => {
+        const date = r.date || 'NO_DATE';
+        if (!byDate[date]) byDate[date] = [];
+        byDate[date].push(r);
+    });
+    
+    console.log('Records by date:', byDate);
+    console.log('Dates found:', Object.keys(byDate).sort());
+    
+    // Show in alert
+    const dateList = Object.keys(byDate).sort().join('\n');
+    alert(`Total Records: ${cashBoxRecords.length}\n\nDates in memory:\n${dateList}\n\nCheck console (F12) for full details.`);
+}
+window.debugCashBoxRecords = debugCashBoxRecords;
+
 // Update sync status indicator
 function updateSyncStatus(syncing, recordCount, errorMsg = null) {
     const statusBar = document.getElementById('sync-status');
@@ -3774,19 +3809,44 @@ function renderCashBoxHistory(records) {
     return;
 }
 
-  records.sort((a, b) => new Date(b.date) - new Date(a.date));
+  // Sort records by date (newest first), handling invalid dates
+  records.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    // Handle invalid dates
+    if (isNaN(dateA.getTime())) return 1;
+    if (isNaN(dateB.getTime())) return -1;
+    return dateB - dateA;
+  });
+  
   records.forEach(r => {
-    const diff = (r.actualAmount - r.expectedClosing).toFixed(2);
+    // Skip records with invalid or missing critical data
+    if (!r.date) {
+      console.warn('Skipping record with missing date:', r);
+      return;
+    }
+    
+    // Safely parse numeric values with defaults
+    const openingBalance = parseFloat(r.openingBalance) || 0;
+    const totalSale = parseFloat(r.totalSale) || 0;
+    const onlinePayments = parseFloat(r.onlinePayments) || 0;
+    const cashSale = parseFloat(r.cashSale) || 0;
+    const totalExpenses = parseFloat(r.totalExpenses) || 0;
+    const expectedClosing = parseFloat(r.expectedClosing) || 0;
+    const actualAmount = parseFloat(r.actualAmount) || 0;
+    
+    const diff = (actualAmount - expectedClosing).toFixed(2);
     const color = diff == 0 ? "#d4edda" : diff > 0 ? "#fff3cd" : "#f8d7da";
+    
     const row = `<tr style="background:${color}">
   <td>${r.date}</td>
-  <td>${r.openingBalance.toFixed(2)}</td>
-  <td>${r.totalSale.toFixed(2)}</td>
-  <td>${r.onlinePayments.toFixed(2)}</td>
-  <td>${r.cashSale.toFixed(2)}</td>
-  <td>${r.totalExpenses.toFixed(2)}</td>
-  <td>${r.expectedClosing.toFixed(2)}</td>
-  <td>${r.actualAmount.toFixed(2)}</td>
+  <td>${openingBalance.toFixed(2)}</td>
+  <td>${totalSale.toFixed(2)}</td>
+  <td>${onlinePayments.toFixed(2)}</td>
+  <td>${cashSale.toFixed(2)}</td>
+  <td>${totalExpenses.toFixed(2)}</td>
+  <td>${expectedClosing.toFixed(2)}</td>
+  <td>${actualAmount.toFixed(2)}</td>
   <td>${diff}</td>
   <td><button style="background:red;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;"
     onclick="deleteCashBoxRecord('${r.id}')">🗑 Delete</button></td>
