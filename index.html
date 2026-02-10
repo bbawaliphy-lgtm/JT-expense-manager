@@ -1229,6 +1229,7 @@ body {
                         </select>
                     </div>
                     <div class="form-group">
+                        <button class="btn btn-primary" onclick="applyFilters()" style="margin-right: 10px;">Search</button>
                         <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
                     </div>
                 </div>
@@ -1756,6 +1757,16 @@ body {
                             <option value="UPI">UPI</option>
                             <option value="Bank Transfer">Bank Transfer</option>
                             <option value="Credit">Credit</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-payee">Payee *</label>
+                        <select id="edit-payee" name="payee" required>
+                            <option value="">Select Payee</option>
+                            <option value="Shop">Shop</option>
+                            <option value="Dyutimala">Dyutimala</option>
+                            <option value="Suvam">Suvam</option>
+                            <option value="Others">Others</option>
                         </select>
                     </div>
                     <div class="form-group full-width">
@@ -2512,10 +2523,15 @@ if (tabName === 'cashBox') {
             document.getElementById('filter-date-from').value = '';
             document.getElementById('filter-date-to').value = '';
             document.getElementById('filter-invoice').value = '';
-            document.getElementById('filter-item').value = '';
             document.getElementById('filter-category').value = '';
             displayRecords();
         }
+
+        // Expose filter functions to window
+        window.applyFilters = applyFilters;
+        window.clearFilters = clearFilters;
+        window.displayRecords = displayRecords;
+        window.getFilteredRecords = getFilteredRecords;
 
         function editRecord(index) {
             editingIndex = index;
@@ -2531,6 +2547,7 @@ if (tabName === 'cashBox') {
             document.getElementById('edit-unit-price').value = purchase.unitPrice;
             document.getElementById('edit-total-cost').value = purchase.totalCost;
             document.getElementById('edit-payment-mode').value = purchase.paymentMode;
+            document.getElementById('edit-payee').value = purchase.payee || '';
             document.getElementById('edit-remarks').value = purchase.remarks;
             
             // Add event listeners for edit form calculation
@@ -2551,6 +2568,7 @@ if (tabName === 'cashBox') {
             e.preventDefault();
             
             const formData = new FormData(this);
+            const oldPurchase = purchases[editingIndex];
             const purchase = {
                 date: formData.get('date'),
                 invoice: formData.get('invoice'),
@@ -2562,8 +2580,14 @@ if (tabName === 'cashBox') {
                 unitPrice: parseFloat(formData.get('unitPrice')),
                 totalCost: parseFloat(formData.get('totalCost')),
                 paymentMode: formData.get('paymentMode'),
+                payee: formData.get('payee') || '',
                 remarks: formData.get('remarks') || ''
             };
+            
+            // Check if payment mode or payee changed (affects cashbox)
+            const paymentModeChanged = oldPurchase.paymentMode !== purchase.paymentMode;
+            const payeeChanged = oldPurchase.payee !== purchase.payee;
+            const affectsCashbox = paymentModeChanged || payeeChanged;
             
             purchases[editingIndex] = purchase;
             saveData();
@@ -2573,7 +2597,11 @@ if (tabName === 'cashBox') {
             backupSingleRecord(purchase);
             closeEditModal();
             
-            alert('Purchase record updated successfully!');
+            let message = 'Purchase record updated successfully!';
+            if (affectsCashbox && (purchase.payee === 'Shop' || oldPurchase.payee === 'Shop')) {
+                message += '\n\nPayment details changed! If you\'re using the Cash Box, please click "Load Shop Cash Expenses" to refresh.';
+            }
+            alert(message);
         });
 
         function deleteRecord(index) {
