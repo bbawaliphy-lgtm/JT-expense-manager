@@ -1103,6 +1103,117 @@ body {
   margin-bottom: 40px;
 }
 
+/* Filter Section */
+.filter-section {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  animation: fadeInScale 0.6s ease-out;
+}
+
+.filter-header {
+  margin-bottom: 20px;
+}
+
+.filter-header h3 {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.filter-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.quick-filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.quick-filter-btn {
+  padding: 12px 24px;
+  border: 2px solid #e5e7eb;
+  background: white;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #6b7280;
+}
+
+.quick-filter-btn:hover {
+  border-color: #667eea;
+  color: #667eea;
+  transform: translateY(-2px);
+}
+
+.quick-filter-btn.active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border-color: #667eea;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.date-range-inputs {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  padding: 15px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.date-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.date-input-group label {
+  font-weight: 600;
+  font-size: 0.9em;
+  color: #4b5563;
+}
+
+.date-input-group input {
+  padding: 10px 15px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.95em;
+  transition: all 0.3s ease;
+  font-family: 'Outfit', sans-serif;
+}
+
+.date-input-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.apply-filter-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.apply-filter-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
 .metric-card {
   background: white;
   border-radius: 20px;
@@ -1132,6 +1243,8 @@ body {
 .metric-card-2 { animation-delay: 0.2s; }
 .metric-card-3 { animation-delay: 0.3s; }
 .metric-card-4 { animation-delay: 0.4s; }
+.metric-card-5 { animation-delay: 0.5s; }
+.metric-card-6 { animation-delay: 0.6s; }
 
 .metric-card:hover {
   transform: translateY(-8px) scale(1.02);
@@ -1159,6 +1272,8 @@ body {
 .metric-card-2::before { background: linear-gradient(90deg, #4facfe, #00f2fe); }
 .metric-card-3::before { background: linear-gradient(90deg, #43e97b, #38f9d7); }
 .metric-card-4::before { background: linear-gradient(90deg, #fa709a, #fee140); }
+.metric-card-5::before { background: linear-gradient(90deg, #a8edea, #fed6e3); }
+.metric-card-6::before { background: linear-gradient(90deg, #ff9a9e, #fecfef); }
 
 .metric-icon {
   font-size: 3.5em;
@@ -1468,6 +1583,526 @@ body {
   .modern-table {
     font-size: 0.85em;
   }
+  
+  .quick-filters {
+    flex-direction: column;
+  }
+  
+  .date-range-inputs {
+    flex-direction: column;
+  }
+}
+
+/* ============================================
+   MODERN CASH BOX STYLES
+   ============================================ */
+
+.cashbox-container {
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg, #fef9f3 0%, #fef3e7 100%);
+  padding: 30px;
+  border-radius: 20px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.cashbox-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.cashbox-title {
+  font-size: 2.5em;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff8a00 0%, #e52e71 50%, #ff6b35 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 8px 0;
+}
+
+.cashbox-subtitle {
+  font-size: 1.05em;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.cashbox-card {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  margin-bottom: 25px;
+  animation: fadeInScale 0.7s ease-out backwards;
+}
+
+.date-card {
+  animation-delay: 0.1s;
+}
+
+.card-header h3 {
+  margin: 0 0 15px 0;
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.date-controls {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.date-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.load-expenses-btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.load-expenses-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.cashbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.cashbox-section {
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  animation: fadeInScale 0.8s ease-out backwards;
+}
+
+.cashbox-section:nth-child(1) { animation-delay: 0.2s; }
+.cashbox-section:nth-child(2) { animation-delay: 0.3s; }
+.cashbox-section:nth-child(3) { animation-delay: 0.4s; }
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 1.3em;
+  font-weight: 700;
+}
+
+.income-header {
+  border-bottom-color: #10b981;
+}
+
+.income-header h3 {
+  color: #10b981;
+}
+
+.expenses-header {
+  border-bottom-color: #ef4444;
+}
+
+.expenses-header h3 {
+  color: #ef4444;
+}
+
+.balance-header {
+  border-bottom-color: #3b82f6;
+}
+
+.balance-header h3 {
+  color: #3b82f6;
+}
+
+.input-card {
+  margin-bottom: 20px;
+}
+
+.input-card label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9em;
+  color: #4b5563;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.modern-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1em;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all 0.3s ease;
+  background: #f9fafb;
+}
+
+.modern-input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currency-symbol {
+  position: absolute;
+  left: 16px;
+  font-size: 1.1em;
+  font-weight: 700;
+  color: #6b7280;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.input-with-icon .modern-input {
+  padding-left: 40px;
+}
+
+.calculated-card {
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  padding: 18px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.calculated-label {
+  font-weight: 700;
+  font-size: 0.95em;
+  color: #4b5563;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.calculated-value {
+  font-size: 1.5em;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  color: #1f2937;
+}
+
+.total-expenses-card {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+}
+
+.add-expense-btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-expense-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.expense-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.expense-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.expense-item:hover {
+  background: white;
+  border-color: #667eea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.expense-item input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9em;
+  transition: all 0.2s ease;
+}
+
+.expense-item input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.balance-card {
+  padding: 25px;
+  border-radius: 14px;
+  text-align: center;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.expected-card {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+}
+
+.balance-label {
+  font-weight: 700;
+  font-size: 1em;
+  color: #1e40af;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.balance-value {
+  font-size: 2.2em;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  color: #1e3a8a;
+}
+
+.match-status {
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1em;
+  text-align: center;
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.save-record-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #ff8a00, #e52e71);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.save-record-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(255, 138, 0, 0.4);
+}
+
+/* History Section */
+.history-section {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  animation: fadeInUp 0.9s ease-out backwards;
+  animation-delay: 0.5s;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f3f4f6;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.history-header h3 {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.history-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.date-input-small {
+  padding: 8px 12px;
+  min-width: 150px;
+}
+
+.export-btn-small,
+.debug-btn-small {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.export-btn-small {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.export-btn-small:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.debug-btn-small {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+}
+
+.debug-btn-small:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.sync-status {
+  padding: 12px;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-left: 4px solid #3b82f6;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.history-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.cashbox-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.cashbox-table thead {
+  background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+}
+
+.cashbox-table th {
+  padding: 15px 18px;
+  text-align: left;
+  font-weight: 700;
+  color: #374151;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.cashbox-table th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.cashbox-table th:last-child {
+  border-top-right-radius: 12px;
+}
+
+.cashbox-table tbody tr {
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.cashbox-table tbody tr:hover {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  transform: scale(1.005);
+}
+
+.cashbox-table td {
+  padding: 15px 18px;
+  color: #4b5563;
+  font-size: 0.9em;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .cashbox-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .cashbox-container {
+    padding: 20px;
+  }
+  
+  .cashbox-title {
+    font-size: 2em;
+  }
+  
+  .date-controls {
+    flex-direction: column;
+  }
+  
+  .history-controls {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .date-input-small,
+  .export-btn-small,
+  .debug-btn-small {
+    width: 100%;
+  }
 }
 
     </style>
@@ -1751,6 +2386,33 @@ body {
                     <div class="dashboard-subtitle">Real-time insights into your business expenses</div>
                 </div>
 
+                <!-- Date Range Filter Section -->
+                <div class="filter-section">
+                    <div class="filter-header">
+                        <h3>📅 Period Analysis</h3>
+                    </div>
+                    <div class="filter-controls">
+                        <div class="quick-filters">
+                            <button class="quick-filter-btn active" onclick="setQuickFilter('today')">Today</button>
+                            <button class="quick-filter-btn" onclick="setQuickFilter('week')">This Week</button>
+                            <button class="quick-filter-btn" onclick="setQuickFilter('month')">This Month</button>
+                            <button class="quick-filter-btn" onclick="setQuickFilter('lastMonth')">Last Month</button>
+                            <button class="quick-filter-btn" onclick="setQuickFilter('custom')">Custom Range</button>
+                        </div>
+                        <div class="date-range-inputs" id="custom-date-range" style="display: none;">
+                            <div class="date-input-group">
+                                <label>From:</label>
+                                <input type="date" id="summary-date-from" onchange="applySummaryDateFilter()">
+                            </div>
+                            <div class="date-input-group">
+                                <label>To:</label>
+                                <input type="date" id="summary-date-to" onchange="applySummaryDateFilter()">
+                            </div>
+                            <button class="apply-filter-btn" onclick="applySummaryDateFilter()">Apply</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Key Metrics Grid -->
                 <div class="metrics-grid">
                     <div class="metric-card metric-card-1">
@@ -1770,13 +2432,22 @@ body {
                             <div class="metric-trend" id="month-trend">—</div>
                         </div>
                     </div>
+
+                    <div class="metric-card metric-card-5">
+                        <div class="metric-icon">📆</div>
+                        <div class="metric-content">
+                            <div class="metric-label">Last Month</div>
+                            <div class="metric-value" id="last-month-total">₹0</div>
+                            <div class="metric-trend" id="last-month-trend">—</div>
+                        </div>
+                    </div>
                     
                     <div class="metric-card metric-card-3">
                         <div class="metric-icon">💳</div>
                         <div class="metric-content">
-                            <div class="metric-label">Total Expenses</div>
-                            <div class="metric-value" id="overall-total">₹0</div>
-                            <div class="metric-trend" id="overall-avg">Avg: ₹0/day</div>
+                            <div class="metric-label">Selected Period</div>
+                            <div class="metric-value" id="filtered-total">₹0</div>
+                            <div class="metric-trend" id="filtered-period">All Time</div>
                         </div>
                     </div>
                     
@@ -1786,6 +2457,15 @@ body {
                             <div class="metric-label">Total Records</div>
                             <div class="metric-value" id="record-count">0</div>
                             <div class="metric-trend" id="record-avg">Avg: 0/day</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card metric-card-6">
+                        <div class="metric-icon">💵</div>
+                        <div class="metric-content">
+                            <div class="metric-label">Overall Total</div>
+                            <div class="metric-value" id="overall-total">₹0</div>
+                            <div class="metric-trend" id="overall-avg">Avg: ₹0/day</div>
                         </div>
                     </div>
                 </div>
@@ -1895,104 +2575,149 @@ body {
   </div>
 </div>
 
-<!-- 🔹 CASH BOX TAB -->
-<div id="cashBox-tab" class="tab-content" style="display:none; padding:20px;">
-  <h2>💰 Cash Box Calculator</h2>
-  <div class="form-group">
-  <label>Date</label>
-  <div style="display:flex; gap:10px; align-items:center;">
-    <input type="date" id="cashDate" style="flex:1;">
-    <button class="btn btn-primary" onclick="loadShopCashExpenses()" style="padding:8px 16px;">📥 Load Shop Expenses</button>
+<!-- 🔹 CASH BOX TAB - MODERN REDESIGN -->
+<div id="cashBox-tab" class="tab-content" style="display:none;">
+  <div class="cashbox-container">
+    <!-- Header -->
+    <div class="cashbox-header">
+      <h2 class="cashbox-title">
+        <span class="title-icon">💰</span>
+        Cash Box Calculator
+      </h2>
+      <p class="cashbox-subtitle">Track daily cash flow and reconcile your cash drawer</p>
+    </div>
+
+    <!-- Date Selection Card -->
+    <div class="cashbox-card date-card">
+      <div class="card-header">
+        <h3>📅 Select Date</h3>
+      </div>
+      <div class="date-controls">
+        <input type="date" id="cashDate" class="modern-input date-input">
+        <button class="load-expenses-btn" onclick="loadShopCashExpenses()">
+          📥 Load Shop Expenses
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Calculator Grid -->
+    <div class="cashbox-grid">
+      
+      <!-- Left Column: Income -->
+      <div class="cashbox-section income-section">
+        <div class="section-header income-header">
+          <h3>💵 Income</h3>
+        </div>
+        
+        <div class="input-card">
+          <label>Opening Balance</label>
+          <div class="input-with-icon">
+            <span class="currency-symbol">₹</span>
+            <input type="number" id="openingBalance" oninput="calculateCashBox()" step="0.01" placeholder="0.00" class="modern-input">
+          </div>
+        </div>
+
+        <div class="input-card">
+          <label>Total Sale</label>
+          <div class="input-with-icon">
+            <span class="currency-symbol">₹</span>
+            <input type="number" id="totalSale" oninput="calculateCashBox()" step="0.01" placeholder="0.00" class="modern-input">
+          </div>
+        </div>
+
+        <div class="input-card">
+          <label>Online Payments</label>
+          <div class="input-with-icon">
+            <span class="currency-symbol">₹</span>
+            <input type="number" id="onlinePayments" oninput="calculateCashBox()" step="0.01" placeholder="0.00" class="modern-input">
+          </div>
+        </div>
+
+        <div class="calculated-card">
+          <div class="calculated-label">Cash Sale</div>
+          <div class="calculated-value" id="cashSale">₹0.00</div>
+        </div>
+      </div>
+
+      <!-- Middle Column: Expenses -->
+      <div class="cashbox-section expenses-section">
+        <div class="section-header expenses-header">
+          <h3>💸 Expenses</h3>
+          <button class="add-expense-btn" onclick="addExpenseItem()">+ Add</button>
+        </div>
+        
+        <div id="expenseList" class="expense-list"></div>
+
+        <div class="calculated-card total-expenses-card">
+          <div class="calculated-label">Total Expenses</div>
+          <div class="calculated-value" id="totalExpenses">₹0.00</div>
+        </div>
+      </div>
+
+      <!-- Right Column: Balance -->
+      <div class="cashbox-section balance-section">
+        <div class="section-header balance-header">
+          <h3>⚖️ Balance</h3>
+        </div>
+        
+        <div class="balance-card expected-card">
+          <div class="balance-label">Expected Closing</div>
+          <div class="balance-value" id="expectedClosing">₹0.00</div>
+        </div>
+
+        <div class="input-card">
+          <label>Actual Counted</label>
+          <div class="input-with-icon">
+            <span class="currency-symbol">₹</span>
+            <input type="number" id="actualAmount" oninput="compareCashBox()" step="0.01" placeholder="0.00" class="modern-input">
+          </div>
+        </div>
+
+        <div id="matchStatus" class="match-status"></div>
+
+        <button class="save-record-btn" onclick="saveCashBoxRecord()">
+          💾 Save Cash Box Record
+        </button>
+      </div>
+    </div>
+
+    <!-- History Section -->
+    <div class="history-section">
+      <div class="history-header">
+        <h3>📜 Cash Box History</h3>
+        <div class="history-controls">
+          <input type="date" id="searchCashDate" onchange="filterCashBoxHistory()" class="modern-input date-input-small">
+          <button class="export-btn-small" onclick="exportCashBoxToExcel()">📊 Export</button>
+          <button class="debug-btn-small" onclick="debugCashBoxRecords()">🔍 Debug</button>
+        </div>
+      </div>
+
+      <!-- Sync Status -->
+      <div id="sync-status" class="sync-status" style="display: none;">
+        <span id="sync-status-text">🔄 Syncing with cloud...</span>
+      </div>
+
+      <div class="history-table-wrapper">
+        <table class="cashbox-table" id="cashBoxHistoryTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Opening</th>
+              <th>Total Sale</th>
+              <th>Online</th>
+              <th>Cash Sale</th>
+              <th>Expenses</th>
+              <th>Expected</th>
+              <th>Actual</th>
+              <th>Difference</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="cashBoxHistoryBody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
-</div>
-
-  <div class="form-group">
-    <label>Opening Balance</label>
-    <input type="number" id="openingBalance" oninput="calculateCashBox()" step="0.01" placeholder="Opening Balance">
-  </div>
-
-  <div class="form-group">
-    <label>Total Sale</label>
-    <input type="number" id="totalSale" oninput="calculateCashBox()" step="0.01" placeholder="Total Sale">
-  </div>
-
-  <div class="form-group">
-    <label>Online Payments</label>
-    <input type="number" id="onlinePayments" oninput="calculateCashBox()" step="0.01" placeholder="Online Payments">
-  </div>
-
-  <div class="form-group">
-    <label>Cash Sale (Auto Calculated)</label>
-    <input type="number" id="cashSale" readonly>
-  </div>
-
-  <div class="form-group">
-    <label>Cash Expenses</label>
-    <button class="btn btn-secondary" onclick="addExpenseItem()">+ Add Expense</button>
-<div id="expenseList"></div>
-  </div>
-
-  <div class="form-group">
-    <label>Total Expenses</label>
-    <input type="text" id="totalExpenses" readonly>
-  </div>
-
-  <div class="form-group">
-    <label>Expected Closing Balance</label>
-    <input type="text" id="expectedClosing" readonly>
-  </div>
-
-  <div class="form-group">
-    <label>Actual Counted Amount</label>
-    <input type="number" id="actualAmount" oninput="compareCashBox()">
-  </div>
-
-  <div id="matchStatus"></div>
-
-  <button class="btn btn-primary" onclick="saveCashBoxRecord()">💾 Save Record</button>
-
-<hr style="margin:20px 0;">
-
-<h3>📜 Cash Box History</h3>
-
-<!-- Sync Status Indicator -->
-<div id="sync-status" class="sync-status-bar" style="
-    padding: 10px;
-    background: #e3f2fd;
-    border-left: 4px solid #2196f3;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    display: none;
-">
-    <span id="sync-status-text">🔄 Syncing with cloud...</span>
-</div>
-
-<div style="margin-bottom:10px;">
-  <label>Search by Date:</label>
-  <input type="date" id="searchCashDate" onchange="filterCashBoxHistory()">
-  <button onclick="exportCashBoxToExcel()" style="background:green;color:white;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;">📊 Export to Excel</button>
-  <button onclick="debugCashBoxRecords()" style="background:blue;color:white;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;margin-left:5px;">🔍 Debug Records</button>
-</div>
-
-<div style="overflow-x:auto;">
-  <table id="cashBoxHistoryTable" border="1" style="width:100%;border-collapse:collapse;">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Opening Balance</th>
-        <th>Total Sale</th>
-        <th>Online</th>
-        <th>Cash Sale</th>
-        <th>Expenses</th>
-        <th>Expected</th>
-        <th>Actual</th>
-        <th>Difference</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="cashBoxHistoryBody"></tbody>
-  </table>
-</div>
 </div>
 
 <!-- Staff Management Tab -->
@@ -3188,17 +3913,93 @@ if (tabName === 'cashBox') {
             }
         }
 
+        // Date filter state
+        let currentDateFilter = 'today';
+        let customDateFrom = null;
+        let customDateTo = null;
+
+        function setQuickFilter(filterType) {
+            // Update active button
+            document.querySelectorAll('.quick-filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            currentDateFilter = filterType;
+            
+            // Show/hide custom date inputs
+            const customRange = document.getElementById('custom-date-range');
+            if (filterType === 'custom') {
+                customRange.style.display = 'flex';
+            } else {
+                customRange.style.display = 'none';
+                customDateFrom = null;
+                customDateTo = null;
+            }
+            
+            updateSummary();
+        }
+
+        function applySummaryDateFilter() {
+            customDateFrom = document.getElementById('summary-date-from').value;
+            customDateTo = document.getElementById('summary-date-to').value;
+            updateSummary();
+        }
+
+        function getFilteredPurchases() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            return purchases.filter(purchase => {
+                const purchaseDate = new Date(purchase.date);
+                purchaseDate.setHours(0, 0, 0, 0);
+                
+                switch(currentDateFilter) {
+                    case 'today':
+                        return purchaseDate.getTime() === today.getTime();
+                    
+                    case 'week':
+                        const weekAgo = new Date(today);
+                        weekAgo.setDate(weekAgo.getDate() - 7);
+                        return purchaseDate >= weekAgo && purchaseDate <= today;
+                    
+                    case 'month':
+                        return purchaseDate.getMonth() === today.getMonth() && 
+                               purchaseDate.getFullYear() === today.getFullYear();
+                    
+                    case 'lastMonth':
+                        const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                        const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+                        return purchaseDate >= lastMonth && purchaseDate <= lastMonthEnd;
+                    
+                    case 'custom':
+                        if (!customDateFrom || !customDateTo) return false;
+                        const from = new Date(customDateFrom);
+                        const to = new Date(customDateTo);
+                        return purchaseDate >= from && purchaseDate <= to;
+                    
+                    default:
+                        return true;
+                }
+            });
+        }
+
         function updateSummary() {
             const today = new Date().toISOString().split('T')[0];
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
+            const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+            const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
             
             let todayTotal = 0;
             let monthTotal = 0;
+            let lastMonthTotal = 0;
             let overallTotal = 0;
+            let filteredTotal = 0;
             const categoryTotals = {};
             const paymentModeTotals = {};
             const dailyTotals = {};
+            
+            // Get filtered purchases for the selected period
+            const filteredPurchases = getFilteredPurchases();
             
             purchases.forEach(purchase => {
                 const purchaseDate = new Date(purchase.date);
@@ -3214,12 +4015,9 @@ if (tabName === 'cashBox') {
                     monthTotal += amount;
                 }
                 
-                // Category totals
-                if (!categoryTotals[purchase.category]) {
-                    categoryTotals[purchase.category] = { amount: 0, count: 0 };
+                if (purchaseDate.getMonth() === lastMonth && purchaseDate.getFullYear() === lastMonthYear) {
+                    lastMonthTotal += amount;
                 }
-                categoryTotals[purchase.category].amount += amount;
-                categoryTotals[purchase.category].count += 1;
                 
                 // Payment mode totals
                 const paymentMode = purchase.paymentMode || 'Unknown';
@@ -3235,11 +4033,41 @@ if (tabName === 'cashBox') {
                 dailyTotals[purchase.date] += amount;
             });
             
+            // Calculate filtered totals and categories from filtered purchases
+            filteredPurchases.forEach(purchase => {
+                const amount = purchase.finalItemTotal || purchase.totalCost;
+                filteredTotal += amount;
+                
+                // Category totals (only for filtered data)
+                if (!categoryTotals[purchase.category]) {
+                    categoryTotals[purchase.category] = { amount: 0, count: 0 };
+                }
+                categoryTotals[purchase.category].amount += amount;
+                categoryTotals[purchase.category].count += 1;
+            });
+            
             // Update metric cards
             document.getElementById('today-total').textContent = `₹${todayTotal.toFixed(2)}`;
             document.getElementById('month-total').textContent = `₹${monthTotal.toFixed(2)}`;
+            document.getElementById('last-month-total').textContent = `₹${lastMonthTotal.toFixed(2)}`;
             document.getElementById('overall-total').textContent = `₹${overallTotal.toFixed(2)}`;
+            document.getElementById('filtered-total').textContent = `₹${filteredTotal.toFixed(2)}`;
             document.getElementById('record-count').textContent = purchases.length;
+            
+            // Update period label
+            let periodLabel = 'All Time';
+            switch(currentDateFilter) {
+                case 'today': periodLabel = 'Today'; break;
+                case 'week': periodLabel = 'This Week'; break;
+                case 'month': periodLabel = 'This Month'; break;
+                case 'lastMonth': periodLabel = 'Last Month'; break;
+                case 'custom': 
+                    if (customDateFrom && customDateTo) {
+                        periodLabel = `${customDateFrom} to ${customDateTo}`;
+                    }
+                    break;
+            }
+            document.getElementById('filtered-period').textContent = periodLabel;
             
             // Calculate averages
             const daysWithData = Object.keys(dailyTotals).length;
@@ -3249,7 +4077,25 @@ if (tabName === 'cashBox') {
             document.getElementById('overall-avg').textContent = `Avg: ₹${avgPerDay}/day`;
             document.getElementById('record-avg').textContent = `Avg: ${recordsPerDay}/day`;
             
-            // Update category summary table
+            // Calculate month-over-month change
+            if (lastMonthTotal > 0) {
+                const monthChange = ((monthTotal - lastMonthTotal) / lastMonthTotal * 100).toFixed(1);
+                const monthTrendEl = document.getElementById('month-trend');
+                if (monthChange > 0) {
+                    monthTrendEl.textContent = `+${monthChange}% vs last month`;
+                    monthTrendEl.style.color = '#ef4444';
+                } else {
+                    monthTrendEl.textContent = `${monthChange}% vs last month`;
+                    monthTrendEl.style.color = '#10b981';
+                }
+            }
+            
+            // Last month trend
+            const lastMonthDays = new Date(lastMonthYear, lastMonth + 1, 0).getDate();
+            const lastMonthAvg = lastMonthTotal / lastMonthDays;
+            document.getElementById('last-month-trend').textContent = `Avg: ₹${lastMonthAvg.toFixed(2)}/day`;
+            
+            // Update category summary table (based on filtered data)
             const categorySummary = document.getElementById('category-summary');
             const sortedCategories = Object.entries(categoryTotals)
                 .sort(([,a], [,b]) => b.amount - a.amount);
@@ -3260,13 +4106,13 @@ if (tabName === 'cashBox') {
                         <td colspan="6" class="empty-state">
                             <span class="icon">📊</span>
                             <h3>No data available</h3>
-                            <p>Add some purchase records to see analytics</p>
+                            <p>Add some purchase records or adjust filters</p>
                         </td>
                     </tr>
                 `;
             } else {
                 categorySummary.innerHTML = sortedCategories.map(([category, data]) => {
-                    const percentage = overallTotal > 0 ? (data.amount / overallTotal * 100) : 0;
+                    const percentage = filteredTotal > 0 ? (data.amount / filteredTotal * 100) : 0;
                     const avgPerOrder = data.count > 0 ? (data.amount / data.count) : 0;
                     
                     return `
@@ -3289,7 +4135,7 @@ if (tabName === 'cashBox') {
                 }).join('');
             }
             
-            // Create charts
+            // Create charts (use filtered data for category chart)
             createCategoryChart(categoryTotals);
             createPaymentChart(paymentModeTotals);
             createTrendChart(dailyTotals);
@@ -4050,6 +4896,9 @@ window.exportPayeeSummaryToExcel = exportPayeeSummaryToExcel;
 window.toggleTrendView = toggleTrendView;
 window.exportSummaryPDF = exportSummaryPDF;
 window.updateSummary = updateSummary;
+window.setQuickFilter = setQuickFilter;
+window.applySummaryDateFilter = applySummaryDateFilter;
+window.getFilteredPurchases = getFilteredPurchases;
 
 // Expose new helpers if you want to call them manually
 window.backupSingleRecord = backupSingleRecord;
@@ -4462,23 +5311,24 @@ function calculateCashBox() {
   const openingBalance = parseFloat(document.getElementById('openingBalance').value) || 0;
 
   const cashSale = totalSale - onlinePayments;
-  document.getElementById('cashSale').value = cashSale.toFixed(2);
+  document.getElementById('cashSale').textContent = `₹${cashSale.toFixed(2)}`;
 
   let totalExp = 0;
   cashExpenses.forEach((_, i) => {
     totalExp += parseFloat(document.getElementById(`expAmt${i}`)?.value) || 0;
   });
-  document.getElementById('totalExpenses').value = totalExp.toFixed(2);
+  document.getElementById('totalExpenses').textContent = `₹${totalExp.toFixed(2)}`;
 
   const expected = openingBalance + cashSale - totalExp;
-  document.getElementById('expectedClosing').value = expected.toFixed(2);
+  document.getElementById('expectedClosing').textContent = `₹${expected.toFixed(2)}`;
 
   compareCashBox();
 }
 
 // Compare expected vs actual
 function compareCashBox() {
-  const expected = parseFloat(document.getElementById('expectedClosing').value) || 0;
+  const expectedText = document.getElementById('expectedClosing').textContent.replace('₹', '').trim();
+  const expected = parseFloat(expectedText) || 0;
   const actual = parseFloat(document.getElementById('actualAmount').value) || 0;
   const diff = actual - expected;
   const msgEl = document.getElementById('matchStatus');
@@ -4489,27 +5339,31 @@ function compareCashBox() {
   }
 
   if (Math.abs(diff) < 0.01) {
-    msgEl.innerHTML = `<div style="background:#d4edda;color:#155724;padding:10px;border-radius:5px;">✓ MATCH! Amounts are equal.</div>`;
+    msgEl.innerHTML = `<div style="background:#d1fae5;color:#065f46;padding:15px;border-radius:12px;font-weight:600;text-align:center;">✓ PERFECT MATCH! Amounts are equal.</div>`;
   } else if (diff > 0) {
-    msgEl.innerHTML = `<div style="background:#fff3cd;color:#856404;padding:10px;border-radius:5px;">Excess: ₹${diff.toFixed(2)}</div>`;
+    msgEl.innerHTML = `<div style="background:#fef3c7;color:#92400e;padding:15px;border-radius:12px;font-weight:600;text-align:center;">📈 Excess: ₹${diff.toFixed(2)}</div>`;
   } else {
-    msgEl.innerHTML = `<div style="background:#f8d7da;color:#721c24;padding:10px;border-radius:5px;">Shortage: ₹${Math.abs(diff).toFixed(2)}</div>`;
+    msgEl.innerHTML = `<div style="background:#fee2e2;color:#991b1b;padding:15px;border-radius:12px;font-weight:600;text-align:center;">📉 Shortage: ₹${Math.abs(diff).toFixed(2)}</div>`;
   }
 }
 
 // Save Cash Box Record to Firestore
 async function saveCashBoxRecord() {
+  const cashSaleText = document.getElementById('cashSale').textContent.replace('₹', '').trim();
+  const totalExpensesText = document.getElementById('totalExpenses').textContent.replace('₹', '').trim();
+  const expectedClosingText = document.getElementById('expectedClosing').textContent.replace('₹', '').trim();
+  
   const record = {
     date: document.getElementById('cashDate').value,
     openingBalance: parseFloat(document.getElementById('openingBalance').value) || 0,
     totalSale: parseFloat(document.getElementById('totalSale').value) || 0,
     onlinePayments: parseFloat(document.getElementById('onlinePayments').value) || 0,
-    cashSale: parseFloat(document.getElementById('cashSale').value) || 0,
-    totalExpenses: parseFloat(document.getElementById('totalExpenses').value) || 0,
-    expectedClosing: parseFloat(document.getElementById('expectedClosing').value) || 0,
+    cashSale: parseFloat(cashSaleText) || 0,
+    totalExpenses: parseFloat(totalExpensesText) || 0,
+    expectedClosing: parseFloat(expectedClosingText) || 0,
     actualAmount: parseFloat(document.getElementById('actualAmount').value) || 0,
     difference: (parseFloat(document.getElementById('actualAmount').value) || 0) -
-                (parseFloat(document.getElementById('expectedClosing').value) || 0),
+                (parseFloat(expectedClosingText) || 0),
     timestamp: new Date().toISOString()
   };
 
@@ -4535,9 +5389,9 @@ loadPreviousDayBalance();
 function resetCashBoxForm() {
   document.getElementById('totalSale').value = '';
   document.getElementById('onlinePayments').value = '';
-  document.getElementById('cashSale').value = '';
-  document.getElementById('totalExpenses').value = '';
-  document.getElementById('expectedClosing').value = '';
+  document.getElementById('cashSale').textContent = '₹0.00';
+  document.getElementById('totalExpenses').textContent = '₹0.00';
+  document.getElementById('expectedClosing').textContent = '₹0.00';
   document.getElementById('actualAmount').value = '';
   document.getElementById('matchStatus').innerHTML = '';
   document.getElementById('expenseList').innerHTML = '';
