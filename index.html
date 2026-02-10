@@ -1849,16 +1849,17 @@ function setupFirestoreListeners() {
 
 // Inside setupFirestoreListeners()
 onSnapshot(cashBoxCollection, (snapshot) => {
-    // metadata.fromCache tells us if data is only local or synced with server
-    const source = snapshot.metadata.fromCache ? "local cache" : "server";
-    console.log(`💰 Cash Box syncing from ${source}`);
+    // metadata.fromCache identifies if we are looking at local data only
+    const isCache = snapshot.metadata.fromCache;
+    console.log(`💰 Cash Box sync: ${isCache ? "Local Cache" : "Server Truth"}`);
 
+    // Update the global variable with ALL documents currently in the collection
     cashBoxRecords = snapshot.docs.map(doc => ({ 
         id: doc.id, 
         ...doc.data() 
     }));
 
-    // Re-render immediately whenever any change (local or cloud) happens
+    // Re-render immediately to ensure the UI reflects the most recent sync
     renderCashBoxHistory(cashBoxRecords);
 }, (error) => {
     console.error("❌ Cash Box Sync Error:", error);
@@ -3620,7 +3621,6 @@ async function saveCashBoxRecord() {
 console.log("✅ Saved Cash Box Record with ID:", docRef.id);
 
 alert("💾 Cash box record saved and synced!");
-await fetchCashBoxRecords();
 
 // Store latest actual amount in local memory for next day
 localStorage.setItem("lastActualAmount", record.actualAmount);
@@ -3675,14 +3675,11 @@ function renderCashBoxHistory(records) {
     tbody.innerHTML = "";
 
     if (records.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding: 20px;">
-            <div style="color: #764ba2; font-weight: bold;">
-                🔄 Syncing with Cloud... 
-                <br><small style="font-weight: normal; color: #666;">If this takes long, check your internet connection.</small>
-            </div>
-        </td></tr>`;
-        return;
-    }
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding: 20px;">
+        ${listenersInitialized ? "No records found for this date." : "🔄 Syncing with Cloud..."}
+    </td></tr>`;
+    return;
+}
 
   records.sort((a, b) => new Date(b.date) - new Date(a.date));
   records.forEach(r => {
@@ -3713,7 +3710,6 @@ async function deleteCashBoxRecord(id) {
 
     await deleteDoc(doc(db, "cashBoxRecords", id));
     alert("Cash box record deleted successfully!");
-    fetchCashBoxRecords(); // Refresh history list
   } catch (error) {
     console.error("Error deleting cash box record:", error);
     alert("Failed to delete record. Check console for details.");
@@ -3737,11 +3733,6 @@ function filterCashBoxHistory() {
 function exportCashBoxToExcel() {
   const table = document.getElementById("cashBoxHistoryTable");
   const rows = Array.from(table.querySelectorAll("tr"));
-  if (rows.length <= 1) {
-    alert("No data to export.");
-    return;
-  }
-
   const csv = rows.map(row => {
     return Array.from(row.querySelectorAll("th, td"))
       .map(col => `"${col.innerText.replace(/"/g, '""')}"`).join(",");
@@ -3751,11 +3742,8 @@ function exportCashBoxToExcel() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `CashBox_${new Date().toISOString().split("T")[0]}.csv`;
-  document.body.appendChild(a);
+  a.download = `Juice_Therapy_CashBox_${new Date().toISOString().split("T")[0]}.csv`;
   a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }
 
 // Initialize when tab opens
