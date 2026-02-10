@@ -1432,6 +1432,18 @@ body {
 
 <h3>📜 Cash Box History</h3>
 
+<!-- Sync Status Indicator -->
+<div id="sync-status" class="sync-status-bar" style="
+    padding: 10px;
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    display: none;
+">
+    <span id="sync-status-text">🔄 Syncing with cloud...</span>
+</div>
+
 <div style="margin-bottom:10px;">
   <label>Search by Date:</label>
   <input type="date" id="searchCashDate" onchange="filterCashBoxHistory()">
@@ -1770,7 +1782,9 @@ import {
   deleteDoc,
   enableIndexedDbPersistence,
   onSnapshot,
-  addDoc
+  addDoc,
+  query,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 import {
   getAuth,
@@ -1804,6 +1818,23 @@ const auth = getAuth(app);
 const purchasesCollection = collection(db, "purchases");
 const itemSuggestionsCollection = collection(db, "itemSuggestions");
 const supplierSuggestionsCollection = collection(db, "supplierSuggestions");
+
+// ===== NETWORK & SYNC STATE MONITORING =====
+let isOnline = navigator.onLine;
+let isSyncing = false;
+
+// Monitor network status
+window.addEventListener('online', () => {
+    console.log('🌐 Network reconnected');
+    isOnline = true;
+    updateSyncStatus(false, cashBoxRecords.length);
+});
+
+window.addEventListener('offline', () => {
+    console.log('📡 Network disconnected');
+    isOnline = false;
+    updateSyncStatus(false, cashBoxRecords.length);
+});
 
 // ===== SETUP FIRESTORE LISTENERS (ONLY AFTER LOGIN) =====
 let listenersInitialized = false;
@@ -1848,22 +1879,35 @@ function setupFirestoreListeners() {
   });
 
 // Inside setupFirestoreListeners()
-onSnapshot(cashBoxCollection, (snapshot) => {
-    // metadata.fromCache identifies if we are looking at local data only
-    const isCache = snapshot.metadata.fromCache;
-    console.log(`💰 Cash Box sync: ${isCache ? "Local Cache" : "Server Truth"}`);
+onSnapshot(cashBoxCollection, 
+    {
+        includeMetadataChanges: false  // Only fire on confirmed server updates, not cache
+    },
+    (snapshot) => {
+        const source = snapshot.metadata.fromCache ? "cache" : "server";
+        const hasPendingWrites = snapshot.metadata.hasPendingWrites;
+        
+        console.log(`💰 Cash Box sync: ${source} (${snapshot.docs.length} records, pending writes: ${hasPendingWrites})`);
 
-    // Update the global variable with ALL documents currently in the collection
-    cashBoxRecords = snapshot.docs.map(doc => ({ 
-        id: doc.id, 
-        ...doc.data() 
-    }));
+        // Update the global variable with ALL documents currently in the collection
+        cashBoxRecords = snapshot.docs.map(doc => ({ 
+            id: doc.id, 
+            ...doc.data(),
+            _source: source  // Track data source for debugging
+        }));
 
-    // Re-render immediately to ensure the UI reflects the most recent sync
-    renderCashBoxHistory(cashBoxRecords);
-}, (error) => {
-    console.error("❌ Cash Box Sync Error:", error);
-});
+        // Update sync status
+        isSyncing = snapshot.metadata.fromCache && snapshot.docs.length === 0;
+        updateSyncStatus(isSyncing, cashBoxRecords.length);
+
+        // Re-render immediately to ensure the UI reflects the most recent sync
+        renderCashBoxHistory(cashBoxRecords);
+    }, 
+    (error) => {
+        console.error("❌ Cash Box Sync Error:", error);
+        updateSyncStatus(false, 0, error.message);
+    }
+);
 
 // Setup staff real-time listeners
   setupStaffListeners();
@@ -3666,17 +3710,66 @@ window.openCashBoxTab = openCashBoxTab || ( () => fetchCashBoxRecords && fetchCa
 window.filterCashBoxHistory = filterCashBoxHistory || (()=>{});
 window.exportCashBoxToExcel = exportCashBoxToExcel || (()=>{});
 
+// Update sync status indicator
+function updateSyncStatus(syncing, recordCount, errorMsg = null) {
+    const statusBar = document.getElementById('sync-status');
+    const statusText = document.getElementById('sync-status-text');
+    
+    if (!statusBar || !statusText) return;
+    
+    if (errorMsg) {
+        statusBar.style.background = '#ffebee';
+        statusBar.style.borderLeftColor = '#f44336';
+        statusText.textContent = `❌ Sync error: ${errorMsg}`;
+        statusBar.style.display = 'block';
+    } else if (syncing) {
+        statusBar.style.background = '#fff3e0';
+        statusBar.style.borderLeftColor = '#ff9800';
+        statusText.textContent = '🔄 Syncing with cloud...';
+        statusBar.style.display = 'block';
+    } else if (!isOnline) {
+        statusBar.style.background = '#ffebee';
+        statusBar.style.borderLeftColor = '#f44336';
+        statusText.textContent = '📡 Offline - Showing cached data';
+        statusBar.style.display = 'block';
+    } else {
+        statusBar.style.background = '#e8f5e9';
+        statusBar.style.borderLeftColor = '#4caf50';
+        statusText.textContent = `✅ Synced - ${recordCount} records loaded`;
+        statusBar.style.display = 'block';
+        
+        // Auto-hide success message after 3 seconds
+        setTimeout(() => {
+            statusBar.style.display = 'none';
+        }, 3000);
+    }
+}
 
 
 // Render Cash Box table
 function renderCashBoxHistory(records) {
     const tbody = document.getElementById("cashBoxHistoryBody");
     if (!tbody) return;
+    
+    // Show loading state during initial sync
+    if (!listenersInitialized || isSyncing) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding: 20px;">
+            <div style="font-size: 18px;">🔄 Loading records from cloud...</div>
+            <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                Please wait while we sync your data
+            </div>
+        </td></tr>`;
+        return;
+    }
+    
     tbody.innerHTML = "";
 
     if (records.length === 0) {
     tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding: 20px;">
-        ${listenersInitialized ? "No records found for this date." : "🔄 Syncing with Cloud..."}
+        <div style="font-size: 18px;">📋 No records found</div>
+        <div style="font-size: 14px; color: #666; margin-top: 5px;">
+            ${isOnline ? "Add your first cash box entry above" : "You're offline - records will sync when reconnected"}
+        </div>
     </td></tr>`;
     return;
 }
